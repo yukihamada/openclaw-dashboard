@@ -86,6 +86,7 @@ const PROJECTS_TO_MONITOR = [
   'https://banto.work',
   'https://solun.art',
   'https://elio.love',
+  'https://yukihamada.jp',
 ];
 
 async function refreshHealth() {
@@ -187,6 +188,20 @@ app.post('/api/tasks', requireKey, (req, res) => {
 // GET /api/tasks
 app.get('/api/tasks', (req, res) => {
   res.json(db.prepare('SELECT * FROM tasks ORDER BY updated_at DESC').all());
+});
+
+// DELETE /api/tasks/:id
+app.delete('/api/tasks/:id', requireAdmin, (req, res) => {
+  db.prepare('DELETE FROM tasks WHERE id = ?').run(req.params.id);
+  res.json({ ok: true });
+});
+
+// PATCH /api/tasks/:id
+app.patch('/api/tasks/:id', requireAdmin, (req, res) => {
+  const { title, assignee, status, notes } = req.body;
+  db.prepare('UPDATE tasks SET title=COALESCE(?,title), assignee=COALESCE(?,assignee), status=COALESCE(?,status), notes=COALESCE(?,notes), updated_at=? WHERE id=?')
+    .run(title||null, assignee||null, status||null, notes||null, Date.now(), req.params.id);
+  res.json({ ok: true });
 });
 
 // POST /api/blogs

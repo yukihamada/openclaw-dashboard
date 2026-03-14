@@ -58,6 +58,8 @@ main{position:relative;z-index:1;padding:28px;max-width:1200px;margin:0 auto;}
 .task-title{font-size:13px;font-weight:500;margin-bottom:4px;}
 .task-assignee{font-size:11px;color:var(--muted);}
 .task-notes{font-size:11px;color:var(--muted2);margin-top:4px;}
+.task-delete{float:right;background:none;border:none;cursor:pointer;font-size:13px;opacity:0.4;transition:opacity 0.2s;padding:0 2px;line-height:1;}
+.task-delete:hover{opacity:1;}
 
 /* Task form */
 .task-form-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-top:16px;}
@@ -100,6 +102,7 @@ main{position:relative;z-index:1;padding:28px;max-width:1200px;margin:0 auto;}
     <a href="/agent.html">Agents</a>
     <a href="/metrics.html">Metrics</a>
     <a href="/blog.html">Blog</a>
+    <a href="/status.html">Status</a>
   </nav>
   <span class="refresh-info" id="refresh-info">—</span>
 </header>
@@ -201,6 +204,23 @@ async function addTask() {
   }
 }
 
+async function deleteTask(id, btn) {
+  const token = localStorage.getItem('adminToken');
+  if (!token) return;
+  const res = await fetch(`/api/tasks/${id}`, {
+    method: 'DELETE',
+    headers: { 'x-admin-token': token }
+  });
+  if (res.ok) {
+    const card = btn.closest('.task-item');
+    if (card) card.remove();
+    showToast('🗑 タスクを削除しました');
+    loadStatus();
+  } else {
+    showToast('削除に失敗しました');
+  }
+}
+
 async function loadStatus() {
   const [statusRes, tasksRes] = await Promise.all([fetch('/api/status'), fetch('/api/tasks')]);
   const statuses = await statusRes.json();
@@ -224,13 +244,16 @@ async function loadStatus() {
     </div>`;
   }).join('');
 
+  const adminToken = localStorage.getItem('adminToken');
+
   ['todo','in_progress','done'].forEach(st => {
     const id = st.replace('_','');
     const filtered = tasks.filter(t=>t.status===st);
     document.getElementById('cnt-'+id).textContent = filtered.length;
     document.getElementById('tasks-'+id).innerHTML = filtered.map(t=>`
-      <div class="task-item">
-        <div class="task-title">${t.title}</div>
+      <div class="task-item" data-id="${t.id}">
+        <div class="task-title">${t.title}${adminToken?`<button class="task-delete" title="削除" onclick="deleteTask('${t.id}',this)">🗑</button>`:''}
+        </div>
         <div class="task-assignee">👤 ${t.assignee}</div>
         ${t.notes?`<div class="task-notes">${t.notes}</div>`:''}
       </div>`).join('') || '<div style="color:var(--muted2);font-size:12px;padding:8px 0">なし</div>';
