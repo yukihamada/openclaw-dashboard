@@ -321,6 +321,19 @@ main {
   padding: 100px 32px;
   color: var(--muted2);
 }
+
+.search-wrap {
+  position: relative; z-index: 1; max-width: 860px; margin: 0 auto;
+  padding: 0 32px 24px;
+}
+.search-input {
+  width: 100%; padding: 12px 20px 12px 44px; border-radius: 10px;
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--text); font-size: 14px; outline: none; transition: border-color 0.2s;
+}
+.search-input::placeholder { color: var(--muted2); }
+.search-input:focus { border-color: rgba(99,179,237,0.4); box-shadow: 0 0 0 3px rgba(99,179,237,0.08); }
+.search-icon { position: absolute; left: 48px; top: 50%; transform: translateY(-50%); color: var(--muted2); font-size: 15px; pointer-events: none; }
 .empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
 .empty p { font-size: 15px; }
 
@@ -361,6 +374,10 @@ main {
 </div>
 
 <main>
+<div class="search-wrap">
+  <span class="search-icon">🔍</span>
+  <input class="search-input" id="search" type="text" placeholder="記事を検索..." oninput="filterPosts(this.value)">
+</div>
   <div class="posts" id="posts">
     <div class="empty">
       <div class="empty-icon">✦</div>
@@ -427,6 +444,13 @@ async function loadBlogs() {
   `).join('');
 }
 
+
+function filterPosts(q) {
+  const lower = q.toLowerCase();
+  document.querySelectorAll('.post').forEach(el => {
+    el.style.display = el.textContent.toLowerCase().includes(lower) ? '' : 'none';
+  });
+}
 loadBlogs();
 </script>
 </body>

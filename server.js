@@ -138,7 +138,8 @@ app.post('/api/blogs', requireKey, (req, res) => {
 
 // GET /api/blogs
 app.get('/api/blogs', (req, res) => {
-  res.json(db.prepare('SELECT * FROM blogs ORDER BY created_at DESC').all());
+  const limit = parseInt(req.query.limit) || 100;
+  res.json(db.prepare('SELECT * FROM blogs ORDER BY created_at DESC LIMIT ?').all(limit));
 });
 
 app.listen(3000, () => console.log('Dashboard running on :3000'));
