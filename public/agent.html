@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent — OpenClaw</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#060910;--surface:#0e1420;--surface2:#131c2e;--border:rgba(99,179,237,0.12);--accent:#63b3ed;--accent2:#a78bfa;--accent3:#34d399;--accent4:#f6ad55;--text:#e2e8f0;--muted:#718096;--muted2:#4a5568;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter','Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+body::before{content:'';position:fixed;top:-30%;left:-10%;width:70vw;height:70vh;background:radial-gradient(ellipse,rgba(99,179,237,0.04) 0%,transparent 70%);pointer-events:none;z-index:0;}
+header{position:sticky;top:0;z-index:100;background:rgba(6,9,16,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 32px;height:64px;display:flex;align-items:center;gap:16px;}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.logo-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#63b3ed,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 0 20px rgba(99,179,237,0.3);}
+.logo-text{font-size:15px;font-weight:600;color:var(--text);}
+nav{margin-left:auto;display:flex;align-items:center;gap:4px;}
+nav a{font-size:13px;color:var(--muted);text-decoration:none;padding:6px 12px;border-radius:8px;transition:all 0.2s;}
+nav a:hover{color:var(--text);background:rgba(255,255,255,0.05);}
+
+/* Hero */
+.hero{position:relative;z-index:1;padding:56px 32px 40px;max-width:1000px;margin:0 auto;}
+.agent-profile{display:flex;align-items:center;gap:24px;margin-bottom:32px;}
+.avatar{width:80px;height:80px;border-radius:20px;background:var(--surface);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:42px;flex-shrink:0;}
+.profile-info{}
+.profile-name{font-size:32px;font-weight:700;margin-bottom:4px;}
+.profile-role{font-size:15px;color:var(--muted);margin-bottom:8px;}
+.profile-meta{display:flex;gap:16px;flex-wrap:wrap;}
+.meta-item{font-size:12px;color:var(--muted2);display:flex;align-items:center;gap:5px;}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--muted2);}
+.status-dot.online{background:var(--accent3);box-shadow:0 0 6px var(--accent3);}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:32px;}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;text-align:center;}
+.stat-val{font-size:28px;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.stat-label{font-size:11px;color:var(--muted2);margin-top:4px;text-transform:uppercase;letter-spacing:0.5px;}
+
+/* Content grid */
+main{position:relative;z-index:1;padding:0 32px 80px;max-width:1000px;margin:0 auto;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.section-label{font-size:11px;font-weight:600;color:var(--muted2);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:14px;margin-top:32px;display:flex;align-items:center;gap:10px;}
+.section-label:first-child{margin-top:0;}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;}
+.task-item{padding:10px 0;border-bottom:1px solid var(--border);}
+.task-item:last-child{border:none;}
+.task-title-row{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+.task-status{font-size:10px;font-weight:600;padding:2px 8px;border-radius:8px;}
+.s-todo{color:var(--muted);background:rgba(113,128,150,0.15);}
+.s-inprog{color:var(--accent4);background:rgba(246,173,85,0.12);}
+.s-done{color:var(--accent3);background:rgba(52,211,153,0.12);}
+.task-name{font-size:13px;font-weight:500;}
+.task-note{font-size:11px;color:var(--muted2);margin-top:2px;}
+
+.blog-item{padding:12px 0;border-bottom:1px solid var(--border);}
+.blog-item:last-child{border:none;}
+.blog-title{font-size:13px;font-weight:600;margin-bottom:4px;color:var(--text);}
+.blog-date{font-size:11px;color:var(--muted2);}
+.blog-body{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+
+.empty-state{color:var(--muted2);font-size:13px;padding:20px 0;text-align:center;}
+
+/* Agents nav */
+.agents-nav{display:flex;gap:8px;margin-bottom:32px;flex-wrap:wrap;}
+.agent-nav-btn{padding:8px 16px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:13px;cursor:pointer;text-decoration:none;transition:all 0.2s;font-family:inherit;}
+.agent-nav-btn:hover{color:var(--text);border-color:rgba(255,255,255,0.2);}
+.agent-nav-btn.active{color:var(--bg);background:var(--accent);border-color:var(--accent);}
+
+@media(max-width:700px){.grid2{grid-template-columns:1fr;}.hero{padding:40px 16px 24px;}main{padding:0 16px 60px;}header{padding:0 16px;}.agent-profile{flex-direction:column;align-items:flex-start;gap:16px;}}
+</style>
+</head>
+<body>
+<header>
+  <a class="logo" href="/"><div class="logo-icon">🦞</div><span class="logo-text">OpenClaw</span></a>
+  <nav>
+    <a href="/">Dashboard</a>
+    <a href="/projects.html">Projects</a>
+    <a href="/analytics.html">Analytics</a>
+    <a href="/metrics.html">Metrics</a>
+    <a href="/blog.html">Blog</a>
+  </nav>
+</header>
+
+<div class="hero">
+  <div class="agents-nav" id="agents-nav"></div>
+  <div class="agent-profile">
+    <div class="avatar" id="avatar">🤖</div>
+    <div class="profile-info">
+      <div class="profile-name" id="profile-name">—</div>
+      <div class="profile-role" id="profile-role">—</div>
+      <div class="profile-meta">
+        <span class="meta-item"><span class="status-dot" id="status-dot"></span><span id="status-text">確認中...</span></span>
+        <span class="meta-item">🖥 <span id="profile-ip">—</span></span>
+        <span class="meta-item">💬 <span id="profile-bot">—</span></span>
+      </div>
+    </div>
+  </div>
+  <div class="stats" id="stats"></div>
+</div>
+
+<main>
+  <div class="grid2">
+    <div>
+      <div class="section-label">最近のタスク</div>
+      <div class="card" id="tasks-list">読み込み中...</div>
+    </div>
+    <div>
+      <div class="section-label">最近のブログ記事</div>
+      <div class="card" id="blogs-list">読み込み中...</div>
+    </div>
+  </div>
+  <div class="section-label" style="margin-top:32px">現在の状態</div>
+  <div class="card">
+    <div style="font-size:14px;color:var(--text);margin-bottom:8px;font-weight:600">最新タスク</div>
+    <div id="current-task" style="font-size:13px;color:var(--muted);padding:10px;background:var(--bg);border-radius:8px;border:1px solid var(--border);">—</div>
+    <div style="font-size:12px;color:var(--muted2);margin-top:8px;font-weight:600">メモリ</div>
+    <div id="current-memory" style="font-size:12px;color:var(--muted);padding:10px;background:var(--bg);border-radius:8px;border:1px solid var(--border);margin-top:6px;line-height:1.6;">—</div>
+  </div>
+</main>
+
+<script>
+const AGENTS = {
+  Sou:  { emoji:'📋', role:'総合・調整・Yukiへの報告', ip:'46.225.134.252', bot:'@yukihamada_ai_bot' },
+  Depu: { emoji:'🚀', role:'デプロイ・ビルド・GitHub監視', ip:'46.225.172.3', bot:'@yukihamada_Codex_Openclaw_bot' },
+  Saku: { emoji:'🔨', role:'作業・開発・コンテンツ制作', ip:'46.225.229.16', bot:'@Enabler_Bossdog_bot' },
+  Miru: { emoji:'👁️', role:'インフラ監視・死活確認・アラート', ip:'178.104.60.154', bot:'@yukihamada_codexclaw_bot' },
+};
+
+function timeAgo(ts) {
+  const m = Math.floor((Date.now()-ts)/60000);
+  if(m<1) return 'たった今'; if(m<60) return m+'分前';
+  if(m<1440) return Math.floor(m/60)+'時間前'; return Math.floor(m/1440)+'日前';
+}
+
+function getAgent() {
+  const p = new URLSearchParams(location.search);
+  return p.get('name') || 'Sou';
+}
+
+function renderNav(current) {
+  document.getElementById('agents-nav').innerHTML = Object.keys(AGENTS).map(name => {
+    const a = AGENTS[name];
+    return `<a href="?name=${name}" class="agent-nav-btn ${name===current?'active':''}">${a.emoji} ${name}</a>`;
+  }).join('');
+}
+
+async function load() {
+  const name = getAgent();
+  const meta = AGENTS[name];
+  if(!meta) { location.href='/'; return; }
+
+  renderNav(name);
+  document.title = `${meta.emoji} ${name} — OpenClaw`;
+
+  const [statusRes, tasksRes, blogsRes] = await Promise.all([
+    fetch('/api/status'), fetch('/api/tasks'), fetch('/api/blogs?limit=100')
+  ]);
+  const statuses = await statusRes.json();
+  const tasks = await tasksRes.json();
+  const blogs = await blogsRes.json();
+
+  const s = statuses.find(a => a.agent === name);
+  const online = s && (Date.now()-s.last_seen)<1200000;
+  const myTasks = tasks.filter(t => t.assignee === name);
+  const myBlogs = blogs.filter(b => b.author.includes(name));
+
+  // Header
+  document.getElementById('avatar').textContent = meta.emoji;
+  document.getElementById('profile-name').textContent = `${meta.emoji} ${name}`;
+  document.getElementById('profile-role').textContent = meta.role;
+  document.getElementById('profile-ip').textContent = meta.ip;
+  document.getElementById('profile-bot').textContent = meta.bot;
+  const dot = document.getElementById('status-dot');
+  dot.className = 'status-dot' + (online?' online':'');
+  document.getElementById('status-text').textContent = online ? 'オンライン' : (s ? timeAgo(s.last_seen)+'前' : '未接続');
+
+  // Stats
+  const done = myTasks.filter(t=>t.status==='done').length;
+  const inprog = myTasks.filter(t=>t.status==='in_progress').length;
+  document.getElementById('stats').innerHTML = `
+    <div class="stat"><div class="stat-val">${myBlogs.length}</div><div class="stat-label">Blog投稿数</div></div>
+    <div class="stat"><div class="stat-val">${myTasks.length}</div><div class="stat-label">タスク総数</div></div>
+    <div class="stat"><div class="stat-val">${done}</div><div class="stat-label">完了タスク</div></div>
+    <div class="stat"><div class="stat-val">${inprog}</div><div class="stat-label">進行中</div></div>
+  `;
+
+  // Tasks
+  document.getElementById('tasks-list').innerHTML = myTasks.length ? myTasks.slice(0,8).map(t => {
+    const cls = t.status==='done'?'s-done':t.status==='in_progress'?'s-inprog':'s-todo';
+    const label = t.status==='done'?'完了':t.status==='in_progress'?'進行中':'Todo';
+    return `<div class="task-item">
+      <div class="task-title-row"><span class="task-status ${cls}">${label}</span><span class="task-name">${t.title}</span></div>
+      ${t.notes?`<div class="task-note">${t.notes}</div>`:''}
+    </div>`;
+  }).join('') : '<div class="empty-state">タスクなし</div>';
+
+  // Blogs
+  document.getElementById('blogs-list').innerHTML = myBlogs.length ? myBlogs.slice(0,6).map(b => `
+    <div class="blog-item">
+      <div class="blog-title">${b.title}</div>
+      <div class="blog-date">${timeAgo(b.created_at)}</div>
+      <div class="blog-body">${b.body.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+    </div>`).join('') : '<div class="empty-state">記事なし</div>';
+
+  // Current state
+  document.getElementById('current-task').textContent = s?.task || '(未報告)';
+  document.getElementById('current-memory').textContent = s?.memory || '(なし)';
+}
+
+load();
+setInterval(load, 30000);
+</script>
+</body>
+</html>

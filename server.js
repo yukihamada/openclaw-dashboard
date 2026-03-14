@@ -2,10 +2,24 @@ const express = require('express');
 const Database = require('better-sqlite3');
 const https = require('https');
 const http = require('http');
+const crypto = require('crypto');
+const { CloudWatchClient, GetMetricStatisticsCommand } = require('@aws-sdk/client-cloudwatch');
 
 const app = express();
 const db = new Database('/data/dashboard.db');
 const API_KEY = process.env.API_KEY || 'openclaw2026';
+const ADMIN_PASS = process.env.ADMIN_PASS || 'openclaw-admin-2026';
+const sessions = new Map(); // token -> expiry
+
+const cw = new CloudWatchClient({
+  region: process.env.AWS_REGION || 'ap-northeast-1',
+  credentials: process.env.AWS_ACCESS_KEY_ID ? {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  } : undefined,
+});
+let metricsCache = null;
+let metricsCachedAt = 0;
 
 // Init tables
 db.exec(`
@@ -92,6 +106,55 @@ function requireKey(req, res, next) {
   if (req.headers['x-api-key'] === API_KEY) return next();
   res.status(401).json({ error: 'unauthorized' });
 }
+
+function requireAdmin(req, res, next) {
+  const token = req.headers['x-admin-token'] || req.query.token;
+  if (token && sessions.has(token) && sessions.get(token) > Date.now()) return next();
+  res.status(401).json({ error: 'admin auth required' });
+}
+
+// POST /api/admin/login
+app.post('/api/admin/login', (req, res) => {
+  const { password } = req.body;
+  if (password !== ADMIN_PASS) return res.status(401).json({ error: 'wrong password' });
+  const token = crypto.randomBytes(24).toString('hex');
+  sessions.set(token, Date.now() + 8 * 3600 * 1000); // 8h
+  res.json({ token });
+});
+
+// GET /api/lambda-metrics
+app.get('/api/lambda-metrics', async (req, res) => {
+  const now = Date.now();
+  if (metricsCache && now - metricsCachedAt < 5 * 60 * 1000) return res.json(metricsCache);
+
+  const end = new Date();
+  const start = new Date(end - 24 * 3600 * 1000);
+  const fns = ['nanobot-prod'];
+  const metricNames = ['Invocations', 'Errors', 'Duration', 'Throttles'];
+
+  try {
+    const results = {};
+    await Promise.all(fns.flatMap(fn => metricNames.map(async metric => {
+      const cmd = new GetMetricStatisticsCommand({
+        Namespace: 'AWS/Lambda',
+        MetricName: metric,
+        Dimensions: [{ Name: 'FunctionName', Value: fn }],
+        StartTime: start,
+        EndTime: end,
+        Period: 3600,
+        Statistics: metric === 'Duration' ? ['Average', 'p99'] : ['Sum'],
+      });
+      const data = await cw.send(cmd);
+      if (!results[fn]) results[fn] = {};
+      results[fn][metric] = data.Datapoints.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
+    })));
+    metricsCache = results;
+    metricsCachedAt = now;
+    res.json(results);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
 
 // GET /api/health
 app.get('/api/health', (req, res) => {

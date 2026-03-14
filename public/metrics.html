@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Metrics — OpenClaw</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{--bg:#060910;--surface:#0e1420;--surface2:#131c2e;--border:rgba(99,179,237,0.12);--accent:#63b3ed;--accent2:#a78bfa;--accent3:#34d399;--accent4:#f6ad55;--text:#e2e8f0;--muted:#718096;--muted2:#4a5568;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter','Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+body::before{content:'';position:fixed;top:-30%;left:-10%;width:70vw;height:70vh;background:radial-gradient(ellipse,rgba(252,129,129,0.04) 0%,transparent 70%);pointer-events:none;z-index:0;}
+header{position:sticky;top:0;z-index:100;background:rgba(6,9,16,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 32px;height:64px;display:flex;align-items:center;gap:16px;}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.logo-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#63b3ed,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 0 20px rgba(99,179,237,0.3);}
+.logo-text{font-size:15px;font-weight:600;color:var(--text);}
+nav{margin-left:auto;display:flex;align-items:center;gap:4px;}
+nav a{font-size:13px;color:var(--muted);text-decoration:none;padding:6px 12px;border-radius:8px;transition:all 0.2s;}
+nav a:hover{color:var(--text);background:rgba(255,255,255,0.05);}
+nav a.active{color:var(--accent);background:rgba(99,179,237,0.1);}
+.hero{position:relative;z-index:1;padding:64px 32px 40px;max-width:1100px;margin:0 auto;}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:#fc8181;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px;}
+.hero-eyebrow::before{content:'';display:block;width:20px;height:1px;background:#fc8181;}
+.hero h1{font-size:clamp(28px,4vw,44px);font-weight:700;letter-spacing:-0.5px;background:linear-gradient(135deg,#e2e8f0 30%,#fc8181 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+main{position:relative;z-index:1;padding:0 32px 80px;max-width:1100px;margin:0 auto;}
+.section-label{font-size:11px;font-weight:600;color:var(--muted2);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px;margin-top:36px;display:flex;align-items:center;gap:10px;}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:8px;}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;position:relative;overflow:hidden;transition:all 0.3s;}
+.kpi:hover{border-color:rgba(99,179,237,0.25);transform:translateY(-2px);}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--kpi-color,var(--accent));}
+.kpi-label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
+.kpi-value{font-size:32px;font-weight:700;background:var(--kpi-color,linear-gradient(135deg,var(--accent),var(--accent2)));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;}
+.kpi-sub{font-size:12px;color:var(--muted2);margin-top:6px;}
+.charts{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;}
+.chart-title{font-size:14px;font-weight:600;color:var(--muted);margin-bottom:20px;}
+.chart-wrap{position:relative;height:220px;}
+.error-msg{background:rgba(245,101,101,0.1);border:1px solid rgba(245,101,101,0.3);border-radius:10px;padding:16px;color:#fc8181;font-size:13px;margin-top:20px;}
+@media(max-width:640px){header{padding:0 16px;}main{padding:0 16px 60px;}.charts{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<header>
+  <a class="logo" href="/"><div class="logo-icon">🦞</div><span class="logo-text">OpenClaw</span></a>
+  <nav>
+    <a href="/">Dashboard</a>
+    <a href="/projects.html">Projects</a>
+    <a href="/analytics.html">Analytics</a>
+    <a href="/metrics.html" class="active">Metrics</a>
+    <a href="/blog.html">Blog</a>
+  </nav>
+</header>
+<div class="hero">
+  <div class="hero-eyebrow">Lambda CloudWatch</div>
+  <h1>Infrastructure Metrics</h1>
+</div>
+<main>
+  <div id="error-area"></div>
+  <div class="section-label">nanobot-prod (過去24時間)</div>
+  <div class="kpis" id="kpis">
+    <div class="kpi" style="--kpi-color:linear-gradient(135deg,#63b3ed,#4299e1)"><div class="kpi-label">総リクエスト数</div><div class="kpi-value" id="k-inv">—</div><div class="kpi-sub">Invocations</div></div>
+    <div class="kpi" style="--kpi-color:linear-gradient(135deg,#fc8181,#e53e3e)"><div class="kpi-label">エラー数</div><div class="kpi-value" id="k-err">—</div><div class="kpi-sub">Errors (4xx/5xx)</div></div>
+    <div class="kpi" style="--kpi-color:linear-gradient(135deg,#34d399,#38a169)"><div class="kpi-label">平均レイテンシ</div><div class="kpi-value" id="k-dur">—</div><div class="kpi-sub">Duration avg</div></div>
+    <div class="kpi" style="--kpi-color:linear-gradient(135deg,#f6ad55,#ed8936)"><div class="kpi-label">スロットル</div><div class="kpi-value" id="k-thr">—</div><div class="kpi-sub">Throttles</div></div>
+    <div class="kpi" style="--kpi-color:linear-gradient(135deg,#a78bfa,#805ad5)"><div class="kpi-label">エラー率</div><div class="kpi-value" id="k-rate">—</div><div class="kpi-sub">Error rate</div></div>
+    <div class="kpi" style="--kpi-color:linear-gradient(135deg,#76e4f7,#0bc5ea)"><div class="kpi-label">p99 レイテンシ</div><div class="kpi-value" id="k-p99">—</div><div class="kpi-sub">Duration p99</div></div>
+  </div>
+  <div class="section-label" style="margin-top:32px">時系列グラフ</div>
+  <div class="charts">
+    <div class="chart-card"><div class="chart-title">📊 リクエスト数 (1時間ごと)</div><div class="chart-wrap"><canvas id="c-inv"></canvas></div></div>
+    <div class="chart-card"><div class="chart-title">🔴 エラー数 (1時間ごと)</div><div class="chart-wrap"><canvas id="c-err"></canvas></div></div>
+    <div class="chart-card"><div class="chart-title">⏱ 平均レイテンシ ms</div><div class="chart-wrap"><canvas id="c-dur"></canvas></div></div>
+    <div class="chart-card"><div class="chart-title">🚦 スロットル数</div><div class="chart-wrap"><canvas id="c-thr"></canvas></div></div>
+  </div>
+</main>
+<script>
+const GRID = { x:{ticks:{color:'#4a5568'},grid:{color:'rgba(99,179,237,0.06)'}}, y:{ticks:{color:'#4a5568'},grid:{color:'rgba(99,179,237,0.06)'}} };
+
+function makeChart(id, label, color, data, labels) {
+  new Chart(document.getElementById(id), {
+    type: 'line',
+    data: { labels, datasets: [{ label, data, borderColor: color, backgroundColor: color.replace(')',',0.1)').replace('rgb','rgba'), tension: 0.4, fill: true, pointRadius: 3, borderWidth: 2 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: GRID }
+  });
+}
+
+async function load() {
+  const res = await fetch('/api/lambda-metrics');
+  if (!res.ok) {
+    document.getElementById('error-area').innerHTML = `<div class="error-msg">⚠️ CloudWatch取得エラー: ${res.status} — AWS認証情報を確認してください</div>`;
+    return;
+  }
+  const data = await res.json();
+  const fn = data['nanobot-prod'];
+  if (!fn) { document.getElementById('error-area').innerHTML = '<div class="error-msg">データなし</div>'; return; }
+
+  function sum(points, key='Sum') { return points.reduce((s,p) => s + (p[key]||0), 0); }
+  function avg(points, key='Average') { const v = points.filter(p=>p[key]); return v.length ? v.reduce((s,p)=>s+(p[key]||0),0)/v.length : 0; }
+
+  const inv = sum(fn.Invocations||[]);
+  const err = sum(fn.Errors||[]);
+  const dur = avg(fn.Duration||[]);
+  const thr = sum(fn.Throttles||[]);
+  const p99 = avg(fn.Duration||[], 'p99');
+  const rate = inv > 0 ? (err/inv*100).toFixed(1) : 0;
+
+  document.getElementById('k-inv').textContent = inv.toLocaleString();
+  document.getElementById('k-err').textContent = err.toLocaleString();
+  document.getElementById('k-dur').textContent = dur > 0 ? Math.round(dur)+'ms' : '—';
+  document.getElementById('k-thr').textContent = thr.toLocaleString();
+  document.getElementById('k-rate').textContent = rate+'%';
+  document.getElementById('k-p99').textContent = p99 > 0 ? Math.round(p99)+'ms' : '—';
+
+  function toSeries(points, key='Sum') {
+    const sorted = [...points].sort((a,b)=>new Date(a.Timestamp)-new Date(b.Timestamp));
+    return { labels: sorted.map(p=>new Date(p.Timestamp).getHours()+':00'), data: sorted.map(p=>p[key]||0) };
+  }
+
+  const s1 = toSeries(fn.Invocations||[]);
+  makeChart('c-inv','リクエスト','rgb(99,179,237)',s1.data,s1.labels);
+  const s2 = toSeries(fn.Errors||[]);
+  makeChart('c-err','エラー','rgb(245,101,101)',s2.data,s2.labels);
+  const s3 = toSeries(fn.Duration||[],'Average');
+  makeChart('c-dur','平均ms','rgb(52,211,153)',s3.data,s3.labels);
+  const s4 = toSeries(fn.Throttles||[]);
+  makeChart('c-thr','スロットル','rgb(246,173,85)',s4.data,s4.labels);
+}
+
+load();
+setInterval(load, 5*60*1000);
+</script>
+</body>
+</html>
