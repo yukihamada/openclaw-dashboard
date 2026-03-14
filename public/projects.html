@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Projects — OpenClaw</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #060910;
+  --surface: #0e1420;
+  --surface2: #131c2e;
+  --border: rgba(99,179,237,0.12);
+  --accent: #63b3ed;
+  --accent2: #a78bfa;
+  --accent3: #34d399;
+  --accent4: #f6ad55;
+  --text: #e2e8f0;
+  --muted: #718096;
+  --muted2: #4a5568;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter','Noto Sans JP',sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+body::before {
+  content: ''; position: fixed; top: -30%; left: -10%; width: 70vw; height: 70vh;
+  background: radial-gradient(ellipse, rgba(99,179,237,0.05) 0%, transparent 70%);
+  pointer-events: none; z-index: 0;
+}
+body::after {
+  content: ''; position: fixed; bottom: -20%; right: -5%; width: 50vw; height: 50vh;
+  background: radial-gradient(ellipse, rgba(167,139,250,0.06) 0%, transparent 70%);
+  pointer-events: none; z-index: 0;
+}
+
+/* ── Nav ── */
+header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(6,9,16,0.85); backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px; height: 64px; display: flex; align-items: center; gap: 16px;
+}
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.logo-icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: linear-gradient(135deg, #63b3ed, #a78bfa);
+  display: flex; align-items: center; justify-content: center; font-size: 16px;
+  box-shadow: 0 0 20px rgba(99,179,237,0.3);
+}
+.logo-text { font-size: 15px; font-weight: 600; color: var(--text); }
+nav { margin-left: auto; display: flex; align-items: center; gap: 4px; }
+nav a {
+  font-size: 13px; color: var(--muted); text-decoration: none;
+  padding: 6px 14px; border-radius: 8px; transition: all 0.2s;
+}
+nav a:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+nav a.active { color: var(--accent); background: rgba(99,179,237,0.1); }
+
+/* ── Hero ── */
+.hero { position: relative; z-index: 1; padding: 72px 32px 48px; max-width: 1100px; margin: 0 auto; }
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 500; color: var(--accent3);
+  text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 20px;
+}
+.hero-eyebrow::before { content: ''; display: block; width: 20px; height: 1px; background: var(--accent3); }
+.hero h1 {
+  font-size: clamp(28px, 4vw, 48px); font-weight: 700; letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #e2e8f0 30%, #34d399 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  margin-bottom: 12px;
+}
+.hero p { font-size: 16px; color: var(--muted); max-width: 520px; line-height: 1.7; }
+
+/* ── Filter tabs ── */
+.filters {
+  position: relative; z-index: 1;
+  padding: 0 32px 32px; max-width: 1100px; margin: 0 auto;
+  display: flex; gap: 8px; flex-wrap: wrap;
+}
+.filter-btn {
+  font-size: 13px; font-weight: 500; padding: 7px 18px; border-radius: 20px;
+  border: 1px solid var(--border); background: transparent; color: var(--muted);
+  cursor: pointer; transition: all 0.2s;
+}
+.filter-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.15); }
+.filter-btn.active { color: var(--bg); background: var(--accent); border-color: var(--accent); }
+
+/* ── Grid ── */
+main { position: relative; z-index: 1; padding: 0 32px 80px; max-width: 1100px; margin: 0 auto; }
+.section-label {
+  font-size: 11px; font-weight: 600; color: var(--muted2); text-transform: uppercase;
+  letter-spacing: 1.5px; margin-bottom: 16px; margin-top: 40px;
+  display: flex; align-items: center; gap: 10px;
+}
+.section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+
+.card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+  padding: 24px; position: relative; overflow: hidden;
+  transition: all 0.3s ease; cursor: default;
+  animation: fadeUp 0.4s ease forwards; opacity: 0;
+}
+.card:hover {
+  border-color: rgba(99,179,237,0.3);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(99,179,237,0.08);
+  transform: translateY(-3px);
+}
+.card[data-hidden="true"] { display: none; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.card:nth-child(1)  { animation-delay: 0.03s; }
+.card:nth-child(2)  { animation-delay: 0.07s; }
+.card:nth-child(3)  { animation-delay: 0.11s; }
+.card:nth-child(4)  { animation-delay: 0.15s; }
+.card:nth-child(5)  { animation-delay: 0.19s; }
+.card:nth-child(6)  { animation-delay: 0.23s; }
+.card:nth-child(7)  { animation-delay: 0.27s; }
+.card:nth-child(8)  { animation-delay: 0.31s; }
+.card:nth-child(9)  { animation-delay: 0.35s; }
+.card:nth-child(10) { animation-delay: 0.39s; }
+.card:nth-child(11) { animation-delay: 0.43s; }
+.card:nth-child(12) { animation-delay: 0.47s; }
+
+/* Gradient top accent per category */
+.card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--card-accent, linear-gradient(90deg, var(--accent), var(--accent2)));
+  opacity: 0; transition: opacity 0.3s;
+}
+.card:hover::before { opacity: 1; }
+
+.card-header { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 14px; }
+.card-icon {
+  width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 22px;
+  background: var(--surface2); border: 1px solid var(--border);
+}
+.card-title-block {}
+.card-name { font-size: 16px; font-weight: 700; margin-bottom: 3px; }
+.card-url { font-size: 12px; color: var(--accent); text-decoration: none; font-family: monospace; }
+.card-url:hover { text-decoration: underline; }
+
+.status-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-left: auto; margin-top: 4px;
+  background: var(--muted2); transition: all 0.3s;
+}
+.status-dot.up   { background: var(--accent3); box-shadow: 0 0 8px var(--accent3); }
+.status-dot.down { background: #f56565; box-shadow: 0 0 8px #f56565; }
+
+.card-desc { font-size: 13px; color: var(--muted); line-height: 1.65; margin-bottom: 16px; }
+
+.card-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.badge {
+  font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 12px;
+  border: 1px solid; background: transparent;
+}
+.badge-rust   { color: #fc8181; border-color: rgba(252,129,129,0.25); }
+.badge-react  { color: #63b3ed; border-color: rgba(99,179,237,0.25); }
+.badge-swift  { color: #f6ad55; border-color: rgba(246,173,85,0.25); }
+.badge-ts     { color: #76e4f7; border-color: rgba(118,228,247,0.25); }
+.badge-lambda { color: #fc8181; border-color: rgba(252,129,129,0.2); }
+.badge-fly    { color: #a78bfa; border-color: rgba(167,139,250,0.25); }
+.badge-supabase { color: #34d399; border-color: rgba(52,211,153,0.25); }
+.badge-solana { color: #9f7aea; border-color: rgba(159,122,234,0.25); }
+.badge-ios    { color: #f6ad55; border-color: rgba(246,173,85,0.2); }
+.badge-next   { color: #e2e8f0; border-color: rgba(226,232,240,0.2); }
+
+.card-footer {
+  display: flex; align-items: center; gap: 8px;
+  padding-top: 14px; border-top: 1px solid var(--border);
+}
+.latency { font-size: 11px; color: var(--muted2); margin-left: auto; font-family: monospace; }
+.tier-badge {
+  font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 8px; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.tier-1 { color: var(--accent4); background: rgba(246,173,85,0.1); border: 1px solid rgba(246,173,85,0.2); }
+.tier-2 { color: var(--muted); background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
+
+/* Stats bar */
+.stats-bar {
+  position: relative; z-index: 1;
+  padding: 0 32px 0; max-width: 1100px; margin: 0 auto 8px;
+  display: flex; gap: 32px; flex-wrap: wrap;
+}
+.stat { text-align: center; }
+.stat-num { font-size: 28px; font-weight: 700; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.stat-label { font-size: 12px; color: var(--muted2); margin-top: 2px; }
+
+@media (max-width: 640px) {
+  header { padding: 0 16px; }
+  .hero, .filters, main, .stats-bar { padding-left: 16px; padding-right: 16px; }
+  .grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="/">
+    <div class="logo-icon">🦞</div>
+    <span class="logo-text">OpenClaw</span>
+  </a>
+  <nav>
+    <a href="/">Dashboard</a>
+    <a href="/projects.html" class="active">Projects</a>
+    <a href="/blog.html">Blog</a>
+  </nav>
+</header>
+
+<div class="hero">
+  <div class="hero-eyebrow">Product Portfolio</div>
+  <h1>EnablerDAO Projects</h1>
+  <p>Yukiが構築するプロダクト群。Rust・React・Swift・Solanaを組み合わせ、AIと人が共に働く未来を作る。</p>
+</div>
+
+<div class="stats-bar">
+  <div class="stat"><div class="stat-num" id="stat-total">—</div><div class="stat-label">Projects</div></div>
+  <div class="stat"><div class="stat-num" id="stat-up" style="background:linear-gradient(135deg,#34d399,#68d391)">—</div><div class="stat-label">Online</div></div>
+  <div class="stat"><div class="stat-num" id="stat-down" style="background:linear-gradient(135deg,#f56565,#fc8181)">—</div><div class="stat-label">Issues</div></div>
+</div>
+
+<div class="filters">
+  <button class="filter-btn active" onclick="filter('all')">All</button>
+  <button class="filter-btn" onclick="filter('ai')">🤖 AI</button>
+  <button class="filter-btn" onclick="filter('business')">💼 Business</button>
+  <button class="filter-btn" onclick="filter('bjj')">🥋 BJJ</button>
+  <button class="filter-btn" onclick="filter('ios')">📱 iOS</button>
+  <button class="filter-btn" onclick="filter('dao')">🌐 DAO</button>
+  <button class="filter-btn" onclick="filter('infra')">⚙️ Infra</button>
+</div>
+
+<main>
+  <div class="section-label">Tier 1 — 主力プロダクト</div>
+  <div class="grid" id="grid-tier1"></div>
+  <div class="section-label">Tier 2 — 成長中</div>
+  <div class="grid" id="grid-tier2"></div>
+</main>
+
+<script>
+const PROJECTS = [
+  // ─── Tier 1 ───
+  {
+    tier: 1, id: 'chatweb', cat: 'ai',
+    icon: '💬', name: 'chatweb.ai', url: 'https://chatweb.ai',
+    desc: 'OpenAI互換API搭載のAIチャット。日本語Nemotron・Qwen3・GPT-4oなど多数のモデルに対応。クレジット課金・Stripe統合。',
+    tech: ['Rust', 'Lambda', 'DynamoDB'],
+    accent: 'linear-gradient(90deg, #63b3ed, #4299e1)',
+  },
+  {
+    tier: 1, id: 'teai', cat: 'ai',
+    icon: '🍵', name: 'teai.io', url: 'https://teai.io',
+    desc: '日本語特化AIサービス。chatweb.aiと同一Lambdaを共有しつつ、ブランドを完全分離。teai専用ランディングページ付き。',
+    tech: ['Rust', 'Lambda'],
+    accent: 'linear-gradient(90deg, #68d391, #38a169)',
+  },
+  {
+    tier: 1, id: 'stayflow', cat: 'business',
+    icon: '🏠', name: 'StayFlow', url: 'https://stayflowapp.com',
+    desc: '民泊・宿泊施設向け管理SaaS。500施設以上が利用。Beds24連携、LINE Bot、Stripe課金（Starter¥2,900/Pro¥7,900）。',
+    tech: ['React', 'Supabase', 'Stripe'],
+    accent: 'linear-gradient(90deg, #f6ad55, #ed8936)',
+  },
+  {
+    tier: 1, id: 'jiuflow', cat: 'bjj',
+    icon: '🥋', name: 'JiuFlow', url: 'https://jiuflow.art',
+    desc: '柔術選手・技術データベース。100名の選手プロフィール、ダークガラスカードデザイン。Rust SSR + React SPA の2層構成。',
+    tech: ['Rust', 'React', 'Supabase', 'Fly.io'],
+    accent: 'linear-gradient(90deg, #f56565, #e53e3e)',
+  },
+  {
+    tier: 1, id: 'elio', cat: 'ios',
+    icon: '📱', name: 'Elio', url: 'https://elio.love',
+    desc: 'iOS AIアシスタントアプリ。P2P分散推論（EBR Token Gate）、PII Filter、Solana DePINオンチェーン報酬機能搭載。',
+    tech: ['Swift', 'iOS', 'Solana'],
+    accent: 'linear-gradient(90deg, #a78bfa, #805ad5)',
+  },
+  {
+    tier: 1, id: 'openclaw', cat: 'infra',
+    icon: '🦞', name: 'OpenClaw', url: null,
+    desc: 'AI エージェントフレームワーク。このダッシュボードを動かしている基盤。Telegram・LINE・Slack対応、メモリ・ツール・マルチエージェント協調。',
+    tech: ['TypeScript', 'npm'],
+    accent: 'linear-gradient(90deg, #63b3ed, #a78bfa)',
+  },
+  // ─── Tier 2 ───
+  {
+    tier: 2, id: 'miseban', cat: 'business',
+    icon: '🏪', name: 'ミセバンAI', url: 'https://misebanai.com',
+    desc: '飲食店・小売向けAI接客エージェント。Rust 4クレート構成、Fly.io デプロイ。--remote-only --no-cache 必須。',
+    tech: ['Rust', 'Fly.io'],
+    accent: 'linear-gradient(90deg, #f6ad55, #a78bfa)',
+  },
+  {
+    tier: 2, id: 'banto', cat: 'business',
+    icon: '📊', name: 'BANTO', url: 'https://banto.work',
+    desc: 'ビジネス分析・KPI管理ツール。React + Supabase、Fly.io 3アプリ構成（本番・ステージング・管理）。',
+    tech: ['React', 'Supabase', 'Fly.io'],
+    accent: 'linear-gradient(90deg, #76e4f7, #4299e1)',
+  },
+  {
+    tier: 2, id: 'enablerdao', cat: 'dao',
+    icon: '🌐', name: 'EnablerDAO', url: 'https://enablerdao.com',
+    desc: '「すべての人がやりたいことをやれる世界」を体現するDAOポータル。ENAIトークン購入ウィジェット搭載。Next.js 15。',
+    tech: ['Next.js', 'Fly.io', 'Solana'],
+    accent: 'linear-gradient(90deg, #34d399, #68d391)',
+  },
+  {
+    tier: 2, id: 'soluna', cat: 'ai',
+    icon: '🌙', name: 'SOLUNA', url: 'https://solun.art',
+    desc: '音楽×AIプロジェクト。Next.js 16、Fly.io デプロイ。アーティスト向けAIコラボレーションツール。',
+    tech: ['Next.js', 'Fly.io'],
+    accent: 'linear-gradient(90deg, #9f7aea, #667eea)',
+  },
+  {
+    tier: 2, id: 'yukihamada', cat: 'dao',
+    icon: '👤', name: 'yukihamada.jp', url: null,
+    desc: 'Yuki Hamadaのパーソナルサイト。Rust製SSR、Fly.io。',
+    tech: ['Rust', 'Fly.io'],
+    accent: 'linear-gradient(90deg, #e2e8f0, #a0aec0)',
+  },
+  {
+    tier: 2, id: 'newsxyz', cat: 'infra',
+    icon: '📰', name: 'news.xyz', url: null,
+    desc: 'AIニュースアグリゲーター。Rust製バックエンド、Fly.io。',
+    tech: ['Rust', 'Fly.io'],
+    accent: 'linear-gradient(90deg, #fc8181, #f6ad55)',
+  },
+];
+
+const BADGE_CLASS = {
+  'Rust': 'badge-rust', 'React': 'badge-react', 'Swift': 'badge-swift',
+  'TypeScript': 'badge-ts', 'Lambda': 'badge-lambda', 'DynamoDB': 'badge-lambda',
+  'Fly.io': 'badge-fly', 'Supabase': 'badge-supabase', 'Solana': 'badge-solana',
+  'iOS': 'badge-ios', 'Next.js': 'badge-next', 'npm': 'badge-ts',
+  'Stripe': 'badge-supabase',
+};
+
+const URL_MAP = {
+  'chatweb': 'https://chatweb.ai',
+  'teai': 'https://teai.io',
+  'stayflow': 'https://stayflowapp.com',
+  'jiuflow': 'https://jiuflow.art',
+  'elio': 'https://elio.love',
+  'miseban': 'https://misebanai.com',
+  'banto': 'https://banto.work',
+  'enablerdao': 'https://enablerdao.com',
+  'soluna': 'https://solun.art',
+};
+
+let healthData = {};
+let currentFilter = 'all';
+
+function renderCard(p) {
+  const h = healthData[URL_MAP[p.id] ? URL_MAP[p.id].replace('https://','https://') : null] || {};
+  const dotClass = !p.url ? '' : (h.status === 'up' ? 'up' : h.status === 'down' ? 'down' : '');
+  const latency = h.latency ? `${h.latency}ms` : '';
+  const badges = p.tech.map(t => `<span class="badge ${BADGE_CLASS[t]||'badge-ts'}">${t}</span>`).join('');
+  const urlLink = p.url ? `<a class="card-url" href="${p.url}" target="_blank">${p.url.replace('https://','')}</a>` : `<span class="card-url" style="color:var(--muted2)">internal</span>`;
+
+  return `
+    <div class="card" data-cat="${p.cat}" style="--card-accent:${p.accent}">
+      <div class="card-header">
+        <div class="card-icon">${p.icon}</div>
+        <div class="card-title-block">
+          <div class="card-name">${p.name}</div>
+          ${urlLink}
+        </div>
+        ${p.url ? `<div class="status-dot ${dotClass}" title="${h.status||'checking…'}"></div>` : ''}
+      </div>
+      <div class="card-desc">${p.desc}</div>
+      <div class="card-meta">${badges}</div>
+      <div class="card-footer">
+        <span class="tier-badge tier-${p.tier}">Tier ${p.tier}</span>
+        ${latency ? `<span class="latency">${latency}</span>` : ''}
+      </div>
+    </div>`;
+}
+
+function render() {
+  const t1 = PROJECTS.filter(p => p.tier === 1);
+  const t2 = PROJECTS.filter(p => p.tier === 2);
+  document.getElementById('grid-tier1').innerHTML = t1.map(renderCard).join('');
+  document.getElementById('grid-tier2').innerHTML = t2.map(renderCard).join('');
+  applyFilter(currentFilter);
+  updateStats();
+}
+
+function applyFilter(cat) {
+  currentFilter = cat;
+  document.querySelectorAll('.card').forEach(el => {
+    el.dataset.hidden = (cat !== 'all' && el.dataset.cat !== cat) ? 'true' : 'false';
+  });
+  document.querySelectorAll('.filter-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent.toLowerCase().includes(cat) || (cat === 'all' && b.textContent === 'All'));
+  });
+}
+
+function filter(cat) { applyFilter(cat); }
+
+function updateStats() {
+  const urls = Object.keys(URL_MAP).map(k => URL_MAP[k]);
+  let up = 0, down = 0;
+  urls.forEach(url => {
+    if (healthData[url]?.status === 'up') up++;
+    else if (healthData[url]?.status === 'down') down++;
+  });
+  document.getElementById('stat-total').textContent = PROJECTS.length;
+  document.getElementById('stat-up').textContent = up || '—';
+  document.getElementById('stat-down').textContent = down || '0';
+}
+
+async function loadHealth() {
+  const res = await fetch('/api/health');
+  healthData = await res.json();
+  render();
+}
+
+render();
+loadHealth();
+setInterval(loadHealth, 60000);
+</script>
+</body>
+</html>

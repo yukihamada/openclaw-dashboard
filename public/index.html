@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OpenClaw Team Dashboard</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, sans-serif; background: #0d1117; color: #e6edf3; min-height: 100vh; }
+header { background: #161b22; border-bottom: 1px solid #30363d; padding: 16px 24px; display: flex; align-items: center; gap: 12px; }
+header h1 { font-size: 18px; font-weight: 600; }
+.refresh-info { margin-left: auto; font-size: 12px; color: #8b949e; }
+main { padding: 24px; max-width: 1200px; margin: 0 auto; }
+h2 { font-size: 16px; color: #8b949e; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; margin-top: 32px; }
+.agents { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+.agent-card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 20px; }
+.agent-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.agent-emoji { font-size: 28px; }
+.agent-name { font-size: 16px; font-weight: 600; }
+.agent-role { font-size: 12px; color: #8b949e; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; margin-left: auto; flex-shrink: 0; }
+.online { background: #3fb950; box-shadow: 0 0 6px #3fb950; }
+.offline { background: #6e7681; }
+.agent-ip { font-size: 11px; color: #6e7681; font-family: monospace; margin-bottom: 8px; }
+.agent-task { font-size: 13px; color: #e6edf3; margin-bottom: 8px; padding: 8px; background: #0d1117; border-radius: 6px; min-height: 36px; }
+.agent-memory { font-size: 11px; color: #8b949e; line-height: 1.5; max-height: 60px; overflow: hidden; }
+.last-seen { font-size: 11px; color: #6e7681; margin-top: 8px; }
+.tasks-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.task-col { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 16px; }
+.task-col h3 { font-size: 13px; font-weight: 600; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #30363d; }
+.todo h3 { color: #8b949e; }
+.in-progress h3 { color: #d29922; }
+.done h3 { color: #3fb950; }
+.task-item { background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; }
+.task-title { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+.task-assignee { font-size: 11px; color: #8b949e; }
+.task-notes { font-size: 11px; color: #6e7681; margin-top: 4px; }
+</style>
+</head>
+<body>
+<header>
+  <span style="font-size:24px">🦞</span>
+  <h1>OpenClaw Team Dashboard</h1>
+  <nav style="margin-left:auto;display:flex;gap:4px;">
+    <a href="/" style="font-size:13px;color:#63b3ed;text-decoration:none;padding:6px 14px;border-radius:8px;background:rgba(99,179,237,0.1);">Dashboard</a>
+    <a href="/projects.html" style="font-size:13px;color:#718096;text-decoration:none;padding:6px 14px;border-radius:8px;">Projects</a>
+    <a href="/blog.html" style="font-size:13px;color:#718096;text-decoration:none;padding:6px 14px;border-radius:8px;">Blog</a>
+  </nav>
+  <span class="refresh-info" id="refresh-info" style="margin-left:12px;">読み込み中...</span>
+</header>
+<main>
+  <h2>🤖 エージェント</h2>
+  <div class="agents" id="agents">読み込み中...</div>
+  <h2>📋 タスクボード</h2>
+  <div class="tasks-board">
+    <div class="task-col todo"><h3>📋 Todo</h3><div id="tasks-todo"></div></div>
+    <div class="task-col in-progress"><h3>🔄 進行中</h3><div id="tasks-inprogress"></div></div>
+    <div class="task-col done"><h3>✅ 完了</h3><div id="tasks-done"></div></div>
+  </div>
+</main>
+<script>
+const AGENTS_META = {
+  'Hachi': { emoji: '🐝', role: '総合アシスタント', ip: '46.225.134.252' },
+  'Kuro':  { emoji: '⚡', role: '技術特化エンジニア', ip: '46.225.172.3' },
+  'Ichi':  { emoji: '1️⃣', role: 'enablerdao+Twitter担当', ip: '46.225.229.16' },
+  'Ni':    { emoji: '2️⃣', role: 'インフラ・セキュリティ', ip: '178.104.60.154' },
+};
+
+function timeAgo(ts) {
+  const mins = Math.floor((Date.now() - ts) / 60000);
+  if (mins < 1) return 'たった今';
+  if (mins < 60) return `${mins}分前`;
+  if (mins < 1440) return `${Math.floor(mins/60)}時間前`;
+  return `${Math.floor(mins/1440)}日前`;
+}
+
+async function loadStatus() {
+  const [statusRes, tasksRes] = await Promise.all([fetch('/api/status'), fetch('/api/tasks')]);
+  const statuses = await statusRes.json();
+  const tasks = await tasksRes.json();
+  const statusMap = {};
+  statuses.forEach(s => statusMap[s.agent] = s);
+
+  const agentsEl = document.getElementById('agents');
+  agentsEl.innerHTML = Object.entries(AGENTS_META).map(([name, meta]) => {
+    const s = statusMap[name];
+    const online = s && (Date.now() - s.last_seen) < 1200000;
+    return `<div class="agent-card">
+      <div class="agent-header">
+        <span class="agent-emoji">${meta.emoji}</span>
+        <div><div class="agent-name">${name}</div><div class="agent-role">${meta.role}</div></div>
+        <span class="status-dot ${online ? 'online' : 'offline'}"></span>
+      </div>
+      <div class="agent-ip">${meta.ip}</div>
+      <div class="agent-task">${s?.task || '(未報告)'}</div>
+      <div class="agent-memory">${s?.memory || ''}</div>
+      <div class="last-seen">${s ? '最終報告: ' + timeAgo(s.last_seen) : '未接続'}</div>
+    </div>`;
+  }).join('');
+
+  ['todo', 'in_progress', 'done'].forEach(status => {
+    const el = document.getElementById('tasks-' + status.replace('_',''));
+    el.innerHTML = tasks.filter(t => t.status === status).map(t => `
+      <div class="task-item">
+        <div class="task-title">${t.title}</div>
+        <div class="task-assignee">👤 ${t.assignee}</div>
+        ${t.notes ? `<div class="task-notes">${t.notes}</div>` : ''}
+      </div>`).join('') || '<div style="color:#6e7681;font-size:12px;padding:8px">なし</div>';
+  });
+
+  document.getElementById('refresh-info').textContent = '最終更新: ' + new Date().toLocaleTimeString('ja-JP');
+}
+
+loadStatus();
+setInterval(loadStatus, 30000);
+</script>
+</body>
+</html>
