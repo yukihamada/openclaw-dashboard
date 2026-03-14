@@ -4,74 +4,199 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OpenClaw Team Dashboard</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#63b3ed">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: -apple-system, sans-serif; background: #0d1117; color: #e6edf3; min-height: 100vh; }
-header { background: #161b22; border-bottom: 1px solid #30363d; padding: 16px 24px; display: flex; align-items: center; gap: 12px; }
-header h1 { font-size: 18px; font-weight: 600; }
-.refresh-info { margin-left: auto; font-size: 12px; color: #8b949e; }
-main { padding: 24px; max-width: 1200px; margin: 0 auto; }
-h2 { font-size: 16px; color: #8b949e; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; margin-top: 32px; }
-.agents { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
-.agent-card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 20px; }
-.agent-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-.agent-emoji { font-size: 28px; }
-.agent-name { font-size: 16px; font-weight: 600; }
-.agent-role { font-size: 12px; color: #8b949e; }
-.status-dot { width: 8px; height: 8px; border-radius: 50%; margin-left: auto; flex-shrink: 0; }
-.online { background: #3fb950; box-shadow: 0 0 6px #3fb950; }
-.offline { background: #6e7681; }
-.agent-ip { font-size: 11px; color: #6e7681; font-family: monospace; margin-bottom: 8px; }
-.agent-task { font-size: 13px; color: #e6edf3; margin-bottom: 8px; padding: 8px; background: #0d1117; border-radius: 6px; min-height: 36px; }
-.agent-memory { font-size: 11px; color: #8b949e; line-height: 1.5; max-height: 60px; overflow: hidden; }
-.last-seen { font-size: 11px; color: #6e7681; margin-top: 8px; }
-.tasks-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-.task-col { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 16px; }
-.task-col h3 { font-size: 13px; font-weight: 600; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #30363d; }
-.todo h3 { color: #8b949e; }
-.in-progress h3 { color: #d29922; }
-.done h3 { color: #3fb950; }
-.task-item { background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; }
-.task-title { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
-.task-assignee { font-size: 11px; color: #8b949e; }
-.task-notes { font-size: 11px; color: #6e7681; margin-top: 4px; }
+:root{--bg:#060910;--surface:#0e1420;--surface2:#131c2e;--border:rgba(99,179,237,0.12);--accent:#63b3ed;--accent2:#a78bfa;--accent3:#34d399;--accent4:#f6ad55;--text:#e2e8f0;--muted:#718096;--muted2:#4a5568;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter','Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+body::before{content:'';position:fixed;top:-30%;left:-10%;width:70vw;height:70vh;background:radial-gradient(ellipse,rgba(99,179,237,0.04) 0%,transparent 70%);pointer-events:none;z-index:0;}
+
+header{position:sticky;top:0;z-index:100;background:rgba(6,9,16,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 28px;height:64px;display:flex;align-items:center;gap:14px;}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.logo-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#63b3ed,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 0 20px rgba(99,179,237,0.3);}
+.logo-text{font-size:15px;font-weight:600;color:var(--text);}
+nav{margin-left:auto;display:flex;align-items:center;gap:2px;}
+nav a{font-size:13px;color:var(--muted);text-decoration:none;padding:6px 12px;border-radius:8px;transition:all 0.2s;white-space:nowrap;}
+nav a:hover{color:var(--text);background:rgba(255,255,255,0.05);}
+nav a.active{color:var(--accent);background:rgba(99,179,237,0.1);}
+.refresh-info{font-size:11px;color:var(--muted2);flex-shrink:0;margin-left:8px;}
+
+main{position:relative;z-index:1;padding:28px;max-width:1200px;margin:0 auto;}
+
+.section-label{font-size:11px;font-weight:600;color:var(--muted2);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px;margin-top:36px;display:flex;align-items:center;gap:10px;}
+.section-label:first-child{margin-top:0;}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* Agents */
+.agents{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;}
+.agent-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;transition:all 0.3s;}
+.agent-card:hover{border-color:rgba(99,179,237,0.25);box-shadow:0 4px 20px rgba(0,0,0,0.3);}
+.agent-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.agent-emoji{font-size:26px;}
+.agent-name{font-size:15px;font-weight:600;}
+.agent-role{font-size:11px;color:var(--muted);margin-top:2px;}
+.status-dot{width:8px;height:8px;border-radius:50%;margin-left:auto;flex-shrink:0;}
+.online{background:var(--accent3);box-shadow:0 0 6px var(--accent3);}
+.offline{background:var(--muted2);}
+.agent-ip{font-size:11px;color:var(--muted2);font-family:monospace;margin-bottom:8px;}
+.agent-task{font-size:13px;color:var(--text);margin-bottom:8px;padding:8px 10px;background:var(--bg);border-radius:6px;min-height:36px;border:1px solid var(--border);}
+.agent-memory{font-size:11px;color:var(--muted);line-height:1.5;max-height:56px;overflow:hidden;}
+.last-seen{font-size:11px;color:var(--muted2);margin-top:8px;}
+
+/* Tasks */
+.tasks-board{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.task-col{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;}
+.task-col-head{font-size:12px;font-weight:600;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.task-col-head span{font-size:11px;background:var(--surface2);border-radius:10px;padding:2px 8px;color:var(--muted);}
+.col-todo .task-col-head{color:var(--muted);}
+.col-inprogress .task-col-head{color:var(--accent4);}
+.col-done .task-col-head{color:var(--accent3);}
+.task-item{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:8px;cursor:pointer;transition:border-color 0.2s;}
+.task-item:hover{border-color:rgba(99,179,237,0.3);}
+.task-title{font-size:13px;font-weight:500;margin-bottom:4px;}
+.task-assignee{font-size:11px;color:var(--muted);}
+.task-notes{font-size:11px;color:var(--muted2);margin-top:4px;}
+
+/* Task form */
+.task-form-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-top:16px;}
+.task-form-title{font-size:13px;font-weight:600;color:var(--muted);margin-bottom:14px;}
+.task-form{display:grid;grid-template-columns:1fr 1fr auto auto;gap:10px;align-items:end;}
+.form-group{display:flex;flex-direction:column;gap:5px;}
+.form-label{font-size:11px;color:var(--muted2);font-weight:500;}
+.form-input,.form-select{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:13px;outline:none;transition:border-color 0.2s;font-family:inherit;}
+.form-input:focus,.form-select:focus{border-color:rgba(99,179,237,0.5);}
+.form-select option{background:var(--surface);}
+.btn{padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all 0.2s;white-space:nowrap;}
+.btn-primary{background:var(--accent);color:var(--bg);}
+.btn-primary:hover{background:#4dabdb;box-shadow:0 0 16px rgba(99,179,237,0.4);}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
+.btn-ghost:hover{color:var(--text);border-color:rgba(255,255,255,0.2);}
+.form-notes{grid-column:1/-1;}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;right:24px;z-index:999;background:var(--surface);border:1px solid var(--accent3);border-radius:10px;padding:12px 18px;font-size:13px;color:var(--accent3);box-shadow:0 4px 20px rgba(0,0,0,0.4);transform:translateY(100px);opacity:0;transition:all 0.3s;}
+.toast.show{transform:translateY(0);opacity:1;}
+
+@media(max-width:900px){
+  .tasks-board{grid-template-columns:1fr;}
+  .task-form{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:600px){
+  header{padding:0 16px;} main{padding:16px;}
+  .task-form{grid-template-columns:1fr;}
+  nav a{padding:6px 8px;font-size:12px;}
+}
 </style>
 </head>
 <body>
 <header>
-  <span style="font-size:24px">🦞</span>
-  <h1>OpenClaw Team Dashboard</h1>
-  <nav style="margin-left:auto;display:flex;gap:4px;">
-    <a href="/" style="font-size:13px;color:#63b3ed;text-decoration:none;padding:6px 14px;border-radius:8px;background:rgba(99,179,237,0.1);">Dashboard</a>
-    <a href="/projects.html" style="font-size:13px;color:#718096;text-decoration:none;padding:6px 14px;border-radius:8px;">Projects</a>
-    <a href="/blog.html" style="font-size:13px;color:#718096;text-decoration:none;padding:6px 14px;border-radius:8px;">Blog</a>
+  <a class="logo" href="/"><div class="logo-icon">🦞</div><span class="logo-text">OpenClaw</span></a>
+  <nav>
+    <a href="/" class="active">Dashboard</a>
+    <a href="/projects.html">Projects</a>
+    <a href="/analytics.html">Analytics</a>
+    <a href="/blog.html">Blog</a>
   </nav>
-  <span class="refresh-info" id="refresh-info" style="margin-left:12px;">読み込み中...</span>
+  <span class="refresh-info" id="refresh-info">—</span>
 </header>
+
 <main>
-  <h2>🤖 エージェント</h2>
+  <div class="section-label">エージェント</div>
   <div class="agents" id="agents">読み込み中...</div>
-  <h2>📋 タスクボード</h2>
+
+  <div class="section-label">タスクボード</div>
   <div class="tasks-board">
-    <div class="task-col todo"><h3>📋 Todo</h3><div id="tasks-todo"></div></div>
-    <div class="task-col in-progress"><h3>🔄 進行中</h3><div id="tasks-inprogress"></div></div>
-    <div class="task-col done"><h3>✅ 完了</h3><div id="tasks-done"></div></div>
+    <div class="task-col col-todo">
+      <div class="task-col-head">📋 Todo <span id="cnt-todo">0</span></div>
+      <div id="tasks-todo"></div>
+    </div>
+    <div class="task-col col-inprogress">
+      <div class="task-col-head">🔄 進行中 <span id="cnt-inprogress">0</span></div>
+      <div id="tasks-inprogress"></div>
+    </div>
+    <div class="task-col col-done">
+      <div class="task-col-head">✅ 完了 <span id="cnt-done">0</span></div>
+      <div id="tasks-done"></div>
+    </div>
+  </div>
+
+  <div class="task-form-wrap">
+    <div class="task-form-title">+ タスクを追加</div>
+    <div class="task-form">
+      <div class="form-group" style="grid-column:1/-1">
+        <label class="form-label">タイトル</label>
+        <input class="form-input" id="f-title" placeholder="タスクの内容を入力..." />
+      </div>
+      <div class="form-group">
+        <label class="form-label">担当エージェント</label>
+        <select class="form-select" id="f-assignee">
+          <option value="Sou">Sou📋 総合</option>
+          <option value="Depu">Depu🚀 デプロイ</option>
+          <option value="Saku">Saku🔨 作業</option>
+          <option value="Miru">Miru👁️ 監視</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">ステータス</label>
+        <select class="form-select" id="f-status">
+          <option value="todo">📋 Todo</option>
+          <option value="in_progress">🔄 進行中</option>
+          <option value="done">✅ 完了</option>
+        </select>
+      </div>
+      <div class="form-group form-notes">
+        <label class="form-label">メモ（任意）</label>
+        <input class="form-input" id="f-notes" placeholder="詳細・背景など" />
+      </div>
+      <button class="btn btn-primary" style="grid-column:-2/-1" onclick="addTask()">追加</button>
+    </div>
   </div>
 </main>
+
+<div class="toast" id="toast"></div>
+
 <script>
 const AGENTS_META = {
-  'Hachi': { emoji: '🐝', role: '総合アシスタント', ip: '46.225.134.252' },
-  'Kuro':  { emoji: '⚡', role: '技術特化エンジニア', ip: '46.225.172.3' },
-  'Ichi':  { emoji: '1️⃣', role: 'enablerdao+Twitter担当', ip: '46.225.229.16' },
-  'Ni':    { emoji: '2️⃣', role: 'インフラ・セキュリティ', ip: '178.104.60.154' },
+  'Sou':  { emoji: '📋', role: '総合・調整', ip: '46.225.134.252' },
+  'Depu': { emoji: '🚀', role: 'デプロイ・ビルド', ip: '46.225.172.3' },
+  'Saku': { emoji: '🔨', role: '作業・開発', ip: '46.225.229.16' },
+  'Miru': { emoji: '👁️', role: '監視・確認', ip: '178.104.60.154' },
 };
 
 function timeAgo(ts) {
-  const mins = Math.floor((Date.now() - ts) / 60000);
-  if (mins < 1) return 'たった今';
-  if (mins < 60) return `${mins}分前`;
-  if (mins < 1440) return `${Math.floor(mins/60)}時間前`;
-  return `${Math.floor(mins/1440)}日前`;
+  const m = Math.floor((Date.now() - ts) / 60000);
+  if (m < 1) return 'たった今';
+  if (m < 60) return `${m}分前`;
+  if (m < 1440) return `${Math.floor(m/60)}時間前`;
+  return `${Math.floor(m/1440)}日前`;
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+async function addTask() {
+  const title = document.getElementById('f-title').value.trim();
+  if (!title) { showToast('タイトルを入力してください'); return; }
+  const assignee = document.getElementById('f-assignee').value;
+  const status = document.getElementById('f-status').value;
+  const notes = document.getElementById('f-notes').value.trim();
+
+  const res = await fetch('/api/tasks', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Api-Key': 'openclaw2026' },
+    body: JSON.stringify({ id: `task-${Date.now()}`, title, assignee, status, notes })
+  });
+  if (res.ok) {
+    document.getElementById('f-title').value = '';
+    document.getElementById('f-notes').value = '';
+    showToast(`✅ ${assignee} にタスクを追加しました`);
+    loadStatus();
+  }
 }
 
 async function loadStatus() {
@@ -81,34 +206,40 @@ async function loadStatus() {
   const statusMap = {};
   statuses.forEach(s => statusMap[s.agent] = s);
 
-  const agentsEl = document.getElementById('agents');
-  agentsEl.innerHTML = Object.entries(AGENTS_META).map(([name, meta]) => {
+  document.getElementById('agents').innerHTML = Object.entries(AGENTS_META).map(([name, meta]) => {
     const s = statusMap[name];
     const online = s && (Date.now() - s.last_seen) < 1200000;
     return `<div class="agent-card">
       <div class="agent-header">
         <span class="agent-emoji">${meta.emoji}</span>
         <div><div class="agent-name">${name}</div><div class="agent-role">${meta.role}</div></div>
-        <span class="status-dot ${online ? 'online' : 'offline'}"></span>
+        <span class="status-dot ${online?'online':'offline'}"></span>
       </div>
       <div class="agent-ip">${meta.ip}</div>
-      <div class="agent-task">${s?.task || '(未報告)'}</div>
-      <div class="agent-memory">${s?.memory || ''}</div>
-      <div class="last-seen">${s ? '最終報告: ' + timeAgo(s.last_seen) : '未接続'}</div>
+      <div class="agent-task">${s?.task||'(未報告)'}</div>
+      <div class="agent-memory">${s?.memory||''}</div>
+      <div class="last-seen">${s?'最終報告: '+timeAgo(s.last_seen):'未接続'}</div>
     </div>`;
   }).join('');
 
-  ['todo', 'in_progress', 'done'].forEach(status => {
-    const el = document.getElementById('tasks-' + status.replace('_',''));
-    el.innerHTML = tasks.filter(t => t.status === status).map(t => `
+  ['todo','in_progress','done'].forEach(st => {
+    const id = st.replace('_','');
+    const filtered = tasks.filter(t=>t.status===st);
+    document.getElementById('cnt-'+id).textContent = filtered.length;
+    document.getElementById('tasks-'+id).innerHTML = filtered.map(t=>`
       <div class="task-item">
         <div class="task-title">${t.title}</div>
         <div class="task-assignee">👤 ${t.assignee}</div>
-        ${t.notes ? `<div class="task-notes">${t.notes}</div>` : ''}
-      </div>`).join('') || '<div style="color:#6e7681;font-size:12px;padding:8px">なし</div>';
+        ${t.notes?`<div class="task-notes">${t.notes}</div>`:''}
+      </div>`).join('') || '<div style="color:var(--muted2);font-size:12px;padding:8px 0">なし</div>';
   });
 
-  document.getElementById('refresh-info').textContent = '最終更新: ' + new Date().toLocaleTimeString('ja-JP');
+  document.getElementById('refresh-info').textContent = new Date().toLocaleTimeString('ja-JP');
+}
+
+// PWA service worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(()=>{});
 }
 
 loadStatus();

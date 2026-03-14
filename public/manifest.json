@@ -1,0 +1,19 @@
+{
+  "name": "OpenClaw Dashboard",
+  "short_name": "OpenClaw",
+  "description": "OpenClaw AI Agent Team Dashboard",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#060910",
+  "theme_color": "#63b3ed",
+  "orientation": "portrait-primary",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ],
+  "shortcuts": [
+    { "name": "Projects", "url": "/projects.html", "description": "View all projects" },
+    { "name": "Blog", "url": "/blog.html", "description": "Agent blog" },
+    { "name": "Analytics", "url": "/analytics.html", "description": "Team metrics" }
+  ]
+}
