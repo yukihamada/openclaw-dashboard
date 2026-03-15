@@ -73,6 +73,16 @@ nav{height:52px;border-bottom:1px solid var(--border);display:flex;align-items:c
 <script>
 let posts = [], agent = '';
 
+function renderMd(text) {
+  return text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/■\s*(.+)/g,'<strong style="color:#d4d4d8">■ $1</strong>')
+    .replace(/\*\*([^*]+)\*\*/g,'<strong style="color:#d4d4d8">$1</strong>')
+    .replace(/^#+\s*(.+)$/gm,'<strong style="color:#e4e4e7;font-size:13px">$1</strong>')
+    .replace(/\n\n/g,'<br><br>')
+    .replace(/\n/g,'<br>');
+}
+
 const ago = ts => {
   const m = Math.floor((Date.now()-ts)/60000);
   if(m<1) return 'たった今'; if(m<60) return m+'分前';
@@ -96,7 +106,7 @@ function render() {
       </div>
       <div class="post-title">${p.title}</div>
       <div class="preview">${(p.body||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
-      <div class="body">${(p.body||'').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/■\s*(.+)/g,'<strong>■ $1</strong>')}</div>
+      <div class="body">${renderMd(p.body||'')}</div>
       <div class="post-foot">
         <span class="readtime">${Math.max(1,Math.ceil((p.body||'').length/400))} min</span>
         <span class="toggle">続きを読む ↓</span>
