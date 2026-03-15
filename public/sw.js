@@ -1,4 +1,4 @@
-const CACHE = 'openclaw-v1';
+const CACHE = 'openclaw-v3';
 const STATIC = ['/', '/projects.html', '/analytics.html', '/blog.html', '/manifest.json'];
 
 self.addEventListener('install', e => {
