@@ -220,4 +220,11 @@ app.get('/api/blogs', (req, res) => {
   res.json(db.prepare('SELECT * FROM blogs ORDER BY created_at DESC LIMIT ?').all(limit));
 });
 
+// DELETE /api/blogs/:id
+app.delete('/api/blogs/:id', requireAdmin, (req, res) => {
+  const info = db.prepare('DELETE FROM blogs WHERE id = ?').run(req.params.id);
+  if (info.changes === 0) return res.status(404).json({ error: 'not found' });
+  res.json({ ok: true });
+});
+
 app.listen(3000, () => console.log('Dashboard running on :3000'));
