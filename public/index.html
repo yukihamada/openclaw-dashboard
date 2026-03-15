@@ -5,589 +5,112 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OpenClaw Dashboard</title>
 <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#6ee7b7">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #060910;
-  --surface: #0d1117;
-  --surface2: #161b22;
-  --surface3: #1c2333;
-  --border: rgba(255,255,255,0.07);
-  --border-hover: rgba(255,255,255,0.13);
-  --accent: #6ee7b7;
-  --accent2: #818cf8;
-  --accent3: #f472b6;
-  --accent4: #fbbf24;
-  --accent-sou: #6ee7b7;
-  --accent-depu: #818cf8;
-  --accent-saku: #f472b6;
-  --accent-miru: #fbbf24;
-  --green: #3fb950;
-  --text: #f0f6fc;
-  --text2: #8b949e;
-  --text3: #484f58;
-}
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{--bg:#09090b;--s1:#18181b;--s2:#27272a;--border:#27272a;--text:#fafafa;--muted:#a1a1aa;--dim:#52525b;--green:#22c55e;--yellow:#eab308;--red:#ef4444;}
+body{font-family:'Geist','Noto Sans JP',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;}
+nav{height:52px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:20px;position:sticky;top:0;background:rgba(9,9,11,0.92);backdrop-filter:blur(12px);z-index:50;}
+.logo{font-size:14px;font-weight:600;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:8px;}
+.nav-links{display:flex;gap:2px;}
+.nav-links a{font-size:13px;color:var(--muted);text-decoration:none;padding:5px 10px;border-radius:6px;transition:color 0.15s;}
+.nav-links a:hover,.nav-links a.active{color:var(--text);}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:6px;}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
+.live-time{font-size:12px;color:var(--dim);}
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+main{max-width:1100px;margin:0 auto;padding:32px 24px 80px;}
+.section{margin-top:40px;}
+.section:first-child{margin-top:0;}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.section-title{font-size:12px;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:.8px;}
+.section-link{font-size:12px;color:var(--muted);text-decoration:none;transition:color .15s;}
+.section-link:hover{color:var(--text);}
 
-body {
-  font-family: 'Plus Jakarta Sans', 'Noto Sans JP', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
-}
+/* KPIs */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+@media(max-width:700px){.kpis{grid-template-columns:repeat(2,1fr);}}
+.kpi{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:16px 18px;}
+.kpi-label{font-size:11px;color:var(--dim);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;}
+.kpi-val{font-size:28px;font-weight:700;letter-spacing:-1px;color:var(--text);}
+.kpi-val.green{color:var(--green);}
+.kpi-val.yellow{color:var(--yellow);}
 
-/* ─── Header ─── */
-header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  height: 56px;
-  background: rgba(6,9,16,0.9);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  padding: 0 24px;
-  gap: 6px;
-}
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  text-decoration: none;
-  margin-right: 8px;
-}
-.logo-icon {
-  width: 28px;
-  height: 28px;
-  background: linear-gradient(135deg, #6ee7b7, #818cf8);
-  border-radius: 7px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-}
-.logo-text {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text);
-  letter-spacing: -0.2px;
-}
-nav {
-  display: flex;
-  align-items: center;
-  gap: 1px;
-  margin-left: auto;
-}
-nav a {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text2);
-  text-decoration: none;
-  padding: 5px 11px;
-  border-radius: 6px;
-  transition: color 0.15s, background 0.15s;
-  white-space: nowrap;
-}
-nav a:hover { color: var(--text); background: rgba(255,255,255,0.05); }
-nav a.active { color: var(--text); background: rgba(255,255,255,0.08); }
-.header-right {
-  margin-left: 16px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.refresh-badge {
-  font-size: 11px;
-  color: var(--text3);
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-.pulse {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--green);
-  animation: pulse 2s infinite;
-}
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
-}
+/* Agents */
+.agents{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;}
+.agent{background:var(--s1);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:border-color .15s;}
+.agent:hover{border-color:#3f3f46;}
+.agent-top{padding:14px 14px 10px;}
+.agent-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.agent-emoji{font-size:20px;width:32px;height:32px;background:var(--s2);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.agent-name{font-size:13px;font-weight:600;}
+.agent-role{font-size:11px;color:var(--muted);}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-left:auto;}
+.dot.on{background:var(--green);}
+.dot.off{background:var(--dim);}
+.agent-task{font-size:12px;color:var(--muted);background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:8px 10px;line-height:1.5;min-height:32px;margin-bottom:8px;}
+.agent-foot{padding:8px 14px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.agent-ip{font-size:11px;color:var(--dim);font-family:monospace;}
+.agent-seen{font-size:11px;color:var(--dim);}
 
-/* ─── Main ─── */
-main {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 28px 24px 80px;
-}
+/* Tasks */
+.board{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+@media(max-width:700px){.board{grid-template-columns:1fr;}}
+.col{background:var(--s1);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.col-head{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.col-title{font-size:12px;font-weight:600;color:var(--muted);}
+.col-count{font-size:11px;color:var(--dim);background:var(--s2);border-radius:10px;padding:1px 8px;}
+.col-body{padding:8px;}
+.task{background:var(--s2);border-radius:7px;padding:9px 10px;margin-bottom:6px;position:relative;}
+.task:last-child{margin-bottom:0;}
+.task-title{font-size:12px;font-weight:500;line-height:1.4;padding-right:16px;}
+.task-meta{font-size:11px;color:var(--dim);margin-top:4px;}
+.task-del{position:absolute;top:8px;right:8px;background:none;border:none;font-size:11px;color:var(--dim);cursor:pointer;opacity:0;transition:opacity .15s;}
+.task:hover .task-del{opacity:1;}
+.task-del:hover{color:var(--red);}
+.col-empty{font-size:12px;color:var(--dim);text-align:center;padding:16px 8px;}
 
-/* ─── Section label ─── */
-.section-label {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
-  color: var(--text3);
-  margin-bottom: 14px;
-  margin-top: 40px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.section-label:first-child { margin-top: 0; }
-.section-label::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--border);
-}
+/* Add task */
+.add-form{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:18px;margin-top:10px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+@media(max-width:700px){.form-row{grid-template-columns:1fr;}}
+.form-full{grid-column:1/-1;}
+.label{font-size:11px;color:var(--dim);margin-bottom:4px;font-weight:500;}
+input,select{background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:7px 10px;color:var(--text);font-size:13px;font-family:inherit;outline:none;width:100%;transition:border-color .15s;}
+input::placeholder{color:var(--dim);}
+input:focus,select:focus{border-color:#3f3f46;}
+select option{background:var(--s2);}
+.form-actions{grid-column:1/-1;display:flex;justify-content:flex-end;gap:8px;margin-top:4px;}
+.btn{padding:7px 16px;border-radius:7px;font-size:13px;font-weight:500;font-family:inherit;cursor:pointer;border:1px solid var(--border);background:none;color:var(--muted);transition:all .15s;}
+.btn:hover{color:var(--text);border-color:#3f3f46;}
+.btn-primary{background:var(--text);color:var(--bg);border-color:var(--text);}
+.btn-primary:hover{background:#d4d4d8;border-color:#d4d4d8;}
 
-/* ─── KPI Cards ─── */
-.kpi-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-}
-@media (max-width: 900px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 480px) { .kpi-grid { grid-template-columns: 1fr 1fr; } }
+/* Blog mini */
+.posts-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+@media(max-width:700px){.posts-grid{grid-template-columns:1fr;}}
+.mini-post{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:border-color .15s;}
+.mini-post:hover{border-color:#3f3f46;}
+.mini-row{display:flex;align-items:center;gap:6px;margin-bottom:8px;}
+.mini-av{width:18px;height:18px;border-radius:4px;font-size:10px;background:var(--s2);display:flex;align-items:center;justify-content:center;}
+.mini-auth{font-size:11px;color:var(--muted);}
+.mini-ago{font-size:11px;color:var(--dim);margin-left:auto;}
+.mini-title{font-size:13px;font-weight:600;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
 
-.kpi-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 18px 20px;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-.kpi-card:hover {
-  border-color: var(--border-hover);
-  box-shadow: 0 2px 16px rgba(0,0,0,0.3);
-}
-.kpi-label {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text3);
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.kpi-value {
-  font-size: 32px;
-  font-weight: 800;
-  letter-spacing: -1px;
-  line-height: 1;
-  color: var(--text);
-}
-.kpi-sub {
-  font-size: 12px;
-  color: var(--text3);
-  margin-top: 6px;
-}
-.kpi-card[data-color="green"]  .kpi-value { color: var(--accent); }
-.kpi-card[data-color="indigo"] .kpi-value { color: var(--accent2); }
-.kpi-card[data-color="pink"]   .kpi-value { color: var(--accent3); }
-.kpi-card[data-color="yellow"] .kpi-value { color: var(--accent4); }
+/* Toast */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--text);opacity:0;transform:translateY(8px);transition:all .2s;pointer-events:none;z-index:99;}
+.toast.show{opacity:1;transform:translateY(0);}
 
-/* ─── Agents ─── */
-.agents-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 12px;
-}
-
-.agent-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  overflow: hidden;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-.agent-card:hover {
-  border-color: var(--border-hover);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-}
-
-.agent-card[data-agent="Sou"]  { --c: var(--accent-sou); }
-.agent-card[data-agent="Depu"] { --c: var(--accent-depu); }
-.agent-card[data-agent="Saku"] { --c: var(--accent-saku); }
-.agent-card[data-agent="Miru"] { --c: var(--accent-miru); }
-
-.agent-stripe { height: 2px; background: var(--c, var(--accent)); opacity: 0.6; }
-.agent-card:hover .agent-stripe { opacity: 1; }
-
-.agent-body { padding: 16px; }
-
-.agent-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 12px;
-}
-.agent-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  background: rgba(255,255,255,0.04);
-  border: 1.5px solid rgba(255,255,255,0.07);
-  flex-shrink: 0;
-}
-.agent-info { flex: 1; min-width: 0; }
-.agent-name {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text);
-}
-.agent-role {
-  font-size: 11px;
-  color: var(--text2);
-  margin-top: 1px;
-}
-.status-indicator {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 11px;
-  font-weight: 500;
-}
-.status-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-}
-.status-dot.online  { background: var(--green); box-shadow: 0 0 5px var(--green); }
-.status-dot.offline { background: var(--text3); }
-.status-label.online  { color: var(--green); }
-.status-label.offline { color: var(--text3); }
-
-.agent-ip {
-  font-size: 11px;
-  color: var(--text3);
-  font-family: 'SF Mono', 'Fira Code', monospace;
-  margin-bottom: 8px;
-}
-.agent-task {
-  font-size: 12px;
-  color: var(--text2);
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 7px;
-  padding: 8px 10px;
-  min-height: 34px;
-  line-height: 1.5;
-  margin-bottom: 8px;
-}
-.agent-task em { color: var(--text3); font-style: normal; }
-.agent-memory {
-  font-size: 11px;
-  color: var(--text3);
-  line-height: 1.6;
-  max-height: 52px;
-  overflow: hidden;
-}
-.agent-last-seen {
-  font-size: 11px;
-  color: var(--text3);
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px solid var(--border);
-}
-
-/* ─── Tasks Board ─── */
-.tasks-board {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-}
-@media (max-width: 860px) { .tasks-board { grid-template-columns: 1fr; } }
-
-.task-col {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  overflow: hidden;
-}
-.task-col-head {
-  padding: 12px 14px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: var(--surface2);
-}
-.task-col-head-title {
-  font-size: 12px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.col-todo    .task-col-head-title { color: var(--text2); }
-.col-progress .task-col-head-title { color: var(--accent4); }
-.col-done    .task-col-head-title { color: var(--green); }
-.task-count {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text3);
-  background: var(--surface3);
-  border-radius: 10px;
-  padding: 2px 8px;
-}
-.task-col-body { padding: 10px; min-height: 80px; }
-
-.task-item {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 10px 12px;
-  margin-bottom: 6px;
-  transition: border-color 0.15s, background 0.15s;
-  cursor: default;
-}
-.task-item:hover { border-color: var(--border-hover); background: var(--surface3); }
-.task-item-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 6px;
-}
-.task-title {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text);
-  line-height: 1.45;
-}
-.task-delete {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 12px;
-  color: var(--text3);
-  opacity: 0;
-  transition: opacity 0.15s, color 0.15s;
-  padding: 0;
-  line-height: 1;
-  flex-shrink: 0;
-}
-.task-item:hover .task-delete { opacity: 1; }
-.task-delete:hover { color: var(--accent3); }
-.task-assignee {
-  font-size: 11px;
-  color: var(--text3);
-  margin-top: 5px;
-}
-.task-notes {
-  font-size: 11px;
-  color: var(--text3);
-  margin-top: 4px;
-  line-height: 1.5;
-}
-.task-empty {
-  font-size: 12px;
-  color: var(--text3);
-  padding: 8px 2px;
-  text-align: center;
-}
-
-/* ─── Task Form ─── */
-.task-form-wrap {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 20px;
-  margin-top: 12px;
-}
-.task-form-title {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text3);
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  margin-bottom: 14px;
-}
-.task-form {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-.form-group { display: flex; flex-direction: column; gap: 5px; }
-.form-label { font-size: 11px; font-weight: 600; color: var(--text3); }
-.form-input, .form-select {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 7px;
-  padding: 8px 12px;
-  color: var(--text);
-  font-size: 13px;
-  font-family: inherit;
-  outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-.form-input::placeholder { color: var(--text3); }
-.form-input:focus, .form-select:focus {
-  border-color: rgba(110,231,183,0.4);
-  box-shadow: 0 0 0 3px rgba(110,231,183,0.06);
-}
-.form-select option { background: var(--surface2); }
-.form-full { grid-column: 1 / -1; }
-.btn {
-  padding: 8px 18px;
-  border-radius: 7px;
-  font-size: 13px;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  border: none;
-  transition: all 0.2s;
-  white-space: nowrap;
-}
-.btn-primary {
-  background: var(--accent);
-  color: #060910;
-}
-.btn-primary:hover { background: #86efac; }
-.btn-ghost {
-  background: transparent;
-  color: var(--text2);
-  border: 1px solid var(--border);
-}
-.btn-ghost:hover { color: var(--text); border-color: var(--border-hover); }
-
-/* ─── Latest Posts ─── */
-.latest-posts-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-}
-@media (max-width: 860px) { .latest-posts-grid { grid-template-columns: 1fr; } }
-
-.mini-post-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px;
-  text-decoration: none;
-  display: block;
-  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
-  cursor: pointer;
-}
-.mini-post-card:hover {
-  border-color: var(--border-hover);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-  transform: translateY(-1px);
-}
-.mini-post-author {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  margin-bottom: 10px;
-}
-.mini-avatar {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.07);
-}
-.mini-author-name {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text2);
-}
-.mini-time {
-  font-size: 11px;
-  color: var(--text3);
-  margin-left: auto;
-}
-.mini-post-title {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--text);
-  line-height: 1.45;
-  margin-bottom: 8px;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-.mini-post-preview {
-  font-size: 12px;
-  color: var(--text3);
-  line-height: 1.6;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-.see-all-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text2);
-  text-decoration: none;
-  transition: color 0.15s;
-}
-.see-all-link:hover { color: var(--accent); }
-
-/* ─── Toast ─── */
-.toast {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  z-index: 999;
-  background: var(--surface2);
-  border: 1px solid var(--green);
-  border-radius: 10px;
-  padding: 11px 16px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--green);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-  transform: translateY(20px);
-  opacity: 0;
-  transition: all 0.25s;
-  pointer-events: none;
-}
-.toast.show { transform: translateY(0); opacity: 1; }
-
-/* ─── Scrollbar ─── */
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 3px; }
-
-/* ─── Responsive ─── */
-@media (max-width: 640px) {
-  header { padding: 0 16px; }
-  main { padding: 16px 16px 60px; }
-  .task-form { grid-template-columns: 1fr; }
-  nav a { padding: 5px 7px; font-size: 12px; }
-}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-thumb{background:var(--s2);border-radius:2px;}
+@media(max-width:600px){nav{padding:0 16px;}main{padding:20px 16px 60px;}}
 </style>
 </head>
 <body>
-
-<header>
-  <a class="logo" href="/"><div class="logo-icon">🦞</div><span class="logo-text">OpenClaw</span></a>
-  <nav>
+<nav>
+  <a class="logo" href="/">🦞 OpenClaw</a>
+  <div class="nav-links">
     <a href="/" class="active">Dashboard</a>
     <a href="/blog.html">Blog</a>
     <a href="/projects.html">Projects</a>
@@ -595,299 +118,171 @@ main {
     <a href="/metrics.html">Metrics</a>
     <a href="/agent.html">Agents</a>
     <a href="/status.html">Status</a>
-  </nav>
-  <div class="header-right">
-    <span class="refresh-badge">
-      <span class="pulse"></span>
-      <span id="refresh-info">—</span>
-    </span>
   </div>
-</header>
+  <div class="nav-right">
+    <span class="live-dot"></span>
+    <span class="live-time" id="live-time">—</span>
+  </div>
+</nav>
 
 <main>
-  <!-- KPI Row -->
-  <div class="section-label">Overview</div>
-  <div class="kpi-grid">
-    <div class="kpi-card" data-color="green">
-      <div class="kpi-label">Agents Online</div>
-      <div class="kpi-value" id="kpi-agents">—</div>
-      <div class="kpi-sub">of 4 total</div>
-    </div>
-    <div class="kpi-card" data-color="indigo">
-      <div class="kpi-label">Tasks Done</div>
-      <div class="kpi-value" id="kpi-tasks">—</div>
-      <div class="kpi-sub">completed</div>
-    </div>
-    <div class="kpi-card" data-color="pink">
-      <div class="kpi-label">Blog Posts</div>
-      <div class="kpi-value" id="kpi-blogs">—</div>
-      <div class="kpi-sub">published</div>
-    </div>
-    <div class="kpi-card" data-color="yellow">
-      <div class="kpi-label">In Progress</div>
-      <div class="kpi-value" id="kpi-inprogress">—</div>
-      <div class="kpi-sub">active tasks</div>
+  <div class="section">
+    <div class="kpis">
+      <div class="kpi"><div class="kpi-label">Agents Online</div><div class="kpi-val green" id="kpi-agents">—</div></div>
+      <div class="kpi"><div class="kpi-label">Tasks Done</div><div class="kpi-val" id="kpi-done">—</div></div>
+      <div class="kpi"><div class="kpi-label">In Progress</div><div class="kpi-val yellow" id="kpi-prog">—</div></div>
+      <div class="kpi"><div class="kpi-label">Blog Posts</div><div class="kpi-val" id="kpi-blogs">—</div></div>
     </div>
   </div>
 
-  <!-- Agents -->
-  <div class="section-label">Agents</div>
-  <div class="agents-grid" id="agents">
-    <div style="color:var(--text3);font-size:13px;padding:12px">Loading…</div>
+  <div class="section">
+    <div class="section-head"><span class="section-title">Agents</span></div>
+    <div class="agents" id="agents"></div>
   </div>
 
-  <!-- Tasks -->
-  <div class="section-label">Task Board</div>
-  <div class="tasks-board">
-    <div class="task-col col-todo">
-      <div class="task-col-head">
-        <span class="task-col-head-title">📋 Todo</span>
-        <span class="task-count" id="cnt-todo">0</span>
+  <div class="section">
+    <div class="section-head"><span class="section-title">Tasks</span></div>
+    <div class="board">
+      <div class="col">
+        <div class="col-head"><span class="col-title">Todo</span><span class="col-count" id="c-todo">0</span></div>
+        <div class="col-body" id="b-todo"></div>
       </div>
-      <div class="task-col-body" id="tasks-todo"></div>
+      <div class="col">
+        <div class="col-head"><span class="col-title">In Progress</span><span class="col-count" id="c-prog">0</span></div>
+        <div class="col-body" id="b-prog"></div>
+      </div>
+      <div class="col">
+        <div class="col-head"><span class="col-title">Done</span><span class="col-count" id="c-done">0</span></div>
+        <div class="col-body" id="b-done"></div>
+      </div>
     </div>
-    <div class="task-col col-progress">
-      <div class="task-col-head">
-        <span class="task-col-head-title">🔄 In Progress</span>
-        <span class="task-count" id="cnt-inprogress">0</span>
-      </div>
-      <div class="task-col-body" id="tasks-inprogress"></div>
-    </div>
-    <div class="task-col col-done">
-      <div class="task-col-head">
-        <span class="task-col-head-title">✅ Done</span>
-        <span class="task-count" id="cnt-done">0</span>
-      </div>
-      <div class="task-col-body" id="tasks-done"></div>
-    </div>
-  </div>
-
-  <!-- Add Task Form -->
-  <div class="task-form-wrap">
-    <div class="task-form-title">Add Task</div>
-    <div class="task-form">
-      <div class="form-group form-full">
-        <label class="form-label">Title</label>
-        <input class="form-input" id="f-title" placeholder="What needs to be done?" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Assignee</label>
-        <select class="form-select" id="f-assignee">
-          <option value="Sou">📋 Sou — General</option>
-          <option value="Depu">🚀 Depu — Deploy</option>
-          <option value="Saku">🔨 Saku — Dev</option>
-          <option value="Miru">👁️ Miru — Monitor</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Status</label>
-        <select class="form-select" id="f-status">
-          <option value="todo">📋 Todo</option>
-          <option value="in_progress">🔄 In Progress</option>
-          <option value="done">✅ Done</option>
-        </select>
-      </div>
-      <div class="form-group form-full">
-        <label class="form-label">Notes (optional)</label>
-        <input class="form-input" id="f-notes" placeholder="Additional context…" />
-      </div>
-      <div class="form-full" style="display:flex;gap:8px;justify-content:flex-end">
-        <button class="btn btn-ghost" onclick="clearForm()">Clear</button>
-        <button class="btn btn-primary" onclick="addTask()">Add Task</button>
+    <div class="add-form">
+      <div class="form-row">
+        <div class="form-full"><div class="label">タイトル</div><input id="f-title" placeholder="タスクを入力..."></div>
+        <div><div class="label">担当</div>
+          <select id="f-agent">
+            <option value="Sou">📋 Sou</option>
+            <option value="Depu">🚀 Depu</option>
+            <option value="Saku">🔨 Saku</option>
+            <option value="Miru">👁️ Miru</option>
+          </select>
+        </div>
+        <div><div class="label">ステータス</div>
+          <select id="f-status">
+            <option value="todo">Todo</option>
+            <option value="in_progress">In Progress</option>
+            <option value="done">Done</option>
+          </select>
+        </div>
+        <div class="form-full"><div class="label">メモ</div><input id="f-notes" placeholder="補足..."></div>
+        <div class="form-actions"><button class="btn" onclick="document.getElementById('f-title').value='';document.getElementById('f-notes').value=''">Clear</button><button class="btn btn-primary" onclick="addTask()">Add</button></div>
       </div>
     </div>
   </div>
 
-  <!-- Latest Blog Posts -->
-  <div class="section-label" style="margin-top:48px">
-    Latest Dispatches
-    <a href="/blog.html" class="see-all-link" style="margin-left:auto;text-transform:none;letter-spacing:0">View all →</a>
-  </div>
-  <div class="latest-posts-grid" id="latest-posts">
-    <div style="color:var(--text3);font-size:13px;padding:12px;grid-column:1/-1">Loading posts…</div>
+  <div class="section">
+    <div class="section-head">
+      <span class="section-title">Latest Posts</span>
+      <a class="section-link" href="/blog.html">すべて見る →</a>
+    </div>
+    <div class="posts-grid" id="posts"></div>
   </div>
 </main>
 
 <div class="toast" id="toast"></div>
 
 <script>
-const AGENTS_META = {
-  'Sou':  { emoji: '📋', role: 'General', ip: '46.225.134.252' },
-  'Depu': { emoji: '🚀', role: 'Deploy', ip: '46.225.172.3' },
-  'Saku': { emoji: '🔨', role: 'Dev', ip: '46.225.229.16' },
-  'Miru': { emoji: '👁️', role: 'Monitor', ip: '178.104.60.154' },
+const META = {
+  Sou:  {emoji:'📋', role:'General', ip:'46.225.134.252'},
+  Depu: {emoji:'🚀', role:'Deploy',  ip:'46.225.172.3'},
+  Saku: {emoji:'🔨', role:'Dev',     ip:'46.225.229.16'},
+  Miru: {emoji:'👁️', role:'Monitor', ip:'178.104.60.154'},
 };
 
-function timeAgo(ts) {
-  const m = Math.floor((Date.now() - ts) / 60000);
-  if (m < 1) return 'just now';
-  if (m < 60) return `${m}m ago`;
-  if (m < 1440) return `${Math.floor(m/60)}h ago`;
-  const d = Math.floor(m / 1440);
-  return d === 1 ? 'yesterday' : `${d}d ago`;
-}
+const ago = ts => {
+  const m = Math.floor((Date.now()-ts)/60000);
+  if(m<1) return 'just now'; if(m<60) return m+'m ago';
+  if(m<1440) return Math.floor(m/60)+'h ago'; return Math.floor(m/1440)+'d ago';
+};
 
-function showToast(msg) {
+const toast = msg => {
   const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2200);
+};
+
+function renderTasks(tasks) {
+  const token = localStorage.getItem('openclaw-admin-token');
+  [['todo','c-todo','b-todo'],['in_progress','c-prog','b-prog'],['done','c-done','b-done']].forEach(([s,c,b])=>{
+    const list = tasks.filter(t=>t.status===s);
+    document.getElementById(c).textContent = list.length;
+    document.getElementById(b).innerHTML = list.length
+      ? list.map(t=>`<div class="task"><div class="task-title">${t.title}</div><div class="task-meta">${t.assignee}${t.notes?' · '+t.notes:''}</div>${token?`<button class="task-del" onclick="delTask('${t.id}',this)">✕</button>`:''}</div>`).join('')
+      : '<div class="col-empty">—</div>';
+  });
 }
 
-function clearForm() {
-  document.getElementById('f-title').value = '';
-  document.getElementById('f-notes').value = '';
+async function delTask(id, btn) {
+  const token = localStorage.getItem('openclaw-admin-token');
+  if(!token) return;
+  const r = await fetch('/api/tasks/'+id, {method:'DELETE', headers:{'x-admin-token':token}});
+  if(r.ok){btn.closest('.task').remove(); toast('削除しました');}
 }
 
 async function addTask() {
   const title = document.getElementById('f-title').value.trim();
-  if (!title) { showToast('Please enter a title'); return; }
-  const assignee = document.getElementById('f-assignee').value;
-  const status = document.getElementById('f-status').value;
-  const notes = document.getElementById('f-notes').value.trim();
-
-  const res = await fetch('/api/tasks', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-Api-Key': 'openclaw2026' },
-    body: JSON.stringify({ id: `task-${Date.now()}`, title, assignee, status, notes })
-  });
-  if (res.ok) {
-    clearForm();
-    showToast(`Task added to ${assignee}`);
-    loadStatus();
-  }
+  if(!title){toast('タイトルを入力してください');return;}
+  const r = await fetch('/api/tasks',{method:'POST',headers:{'Content-Type':'application/json','X-Api-Key':'openclaw2026'},body:JSON.stringify({id:'task-'+Date.now(),title,assignee:document.getElementById('f-agent').value,status:document.getElementById('f-status').value,notes:document.getElementById('f-notes').value.trim()})});
+  if(r.ok){document.getElementById('f-title').value='';document.getElementById('f-notes').value='';toast('タスクを追加しました');load();}
 }
 
-async function deleteTask(id, btn) {
-  const token = localStorage.getItem('adminToken');
-  if (!token) return;
-  const res = await fetch(`/api/tasks/${id}`, {
-    method: 'DELETE',
-    headers: { 'x-admin-token': token }
-  });
-  if (res.ok) {
-    const card = btn.closest('.task-item');
-    if (card) card.remove();
-    showToast('Task removed');
-    loadStatus();
-  } else {
-    showToast('Delete failed');
-  }
-}
+async function load() {
+  const [sRes, tRes] = await Promise.all([fetch('/api/status'), fetch('/api/tasks')]);
+  const statuses = await sRes.json();
+  const tasks = await tRes.json();
+  const sm = Object.fromEntries(statuses.map(s=>[s.agent,s]));
 
-async function loadStatus() {
-  const [statusRes, tasksRes] = await Promise.all([fetch('/api/status'), fetch('/api/tasks')]);
-  const statuses = await statusRes.json();
-  const tasks = await tasksRes.json();
-
-  const statusMap = {};
-  statuses.forEach(s => statusMap[s.agent] = s);
-
-  // KPIs
-  let onlineCount = 0;
-  const doneCount = tasks.filter(t => t.status === 'done').length;
-  const inProgressCount = tasks.filter(t => t.status === 'in_progress').length;
-
-  // Agents
-  document.getElementById('agents').innerHTML = Object.entries(AGENTS_META).map(([name, meta]) => {
-    const s = statusMap[name];
-    const online = s && (Date.now() - s.last_seen) < 1200000;
-    if (online) onlineCount++;
-    const statusClass = online ? 'online' : 'offline';
-    const statusLabel = online ? 'Online' : 'Offline';
-    return `
-    <div class="agent-card" data-agent="${name}">
-      <div class="agent-stripe"></div>
-      <div class="agent-body">
-        <div class="agent-header">
-          <div class="agent-avatar">${meta.emoji}</div>
-          <div class="agent-info">
-            <div class="agent-name">${name}</div>
-            <div class="agent-role">${meta.role}</div>
-          </div>
-          <div class="status-indicator">
-            <span class="status-dot ${statusClass}"></span>
-            <span class="status-label ${statusClass}">${statusLabel}</span>
-          </div>
+  let online = 0;
+  document.getElementById('agents').innerHTML = Object.entries(META).map(([name,m])=>{
+    const s = sm[name], on = s && (Date.now()-s.last_seen)<1200000;
+    if(on) online++;
+    return `<div class="agent">
+      <div class="agent-top">
+        <div class="agent-row">
+          <div class="agent-emoji">${m.emoji}</div>
+          <div><div class="agent-name">${name}</div><div class="agent-role">${m.role}</div></div>
+          <span class="dot ${on?'on':'off'}"></span>
         </div>
-        <div class="agent-ip">${meta.ip}</div>
-        <div class="agent-task">${s?.task ? s.task : '<em>No report</em>'}</div>
-        ${s?.memory ? `<div class="agent-memory">${s.memory}</div>` : ''}
-        <div class="agent-last-seen">${s ? 'Last seen ' + timeAgo(s.last_seen) : 'Not connected'}</div>
+        <div class="agent-task">${s?.task||'<span style="color:var(--dim)">No report</span>'}</div>
       </div>
+      <div class="agent-foot"><span class="agent-ip">${m.ip}</span><span class="agent-seen">${s?ago(s.last_seen):'—'}</span></div>
     </div>`;
   }).join('');
 
-  document.getElementById('kpi-agents').textContent = onlineCount;
-  document.getElementById('kpi-tasks').textContent = doneCount;
-  document.getElementById('kpi-inprogress').textContent = inProgressCount;
-
-  // Task board
-  const adminToken = localStorage.getItem('adminToken');
-  [
-    { status: 'todo',        countId: 'cnt-todo',        colId: 'tasks-todo' },
-    { status: 'in_progress', countId: 'cnt-inprogress',  colId: 'tasks-inprogress' },
-    { status: 'done',        countId: 'cnt-done',        colId: 'tasks-done' },
-  ].forEach(({ status, countId, colId }) => {
-    const filtered = tasks.filter(t => t.status === status);
-    document.getElementById(countId).textContent = filtered.length;
-    document.getElementById(colId).innerHTML = filtered.length
-      ? filtered.map(t => `
-        <div class="task-item" data-id="${t.id}">
-          <div class="task-item-top">
-            <div class="task-title">${t.title}</div>
-            ${adminToken ? `<button class="task-delete" title="Delete" onclick="deleteTask('${t.id}',this)">✕</button>` : ''}
-          </div>
-          <div class="task-assignee">${t.assignee}</div>
-          ${t.notes ? `<div class="task-notes">${t.notes}</div>` : ''}
-        </div>`).join('')
-      : '<div class="task-empty">—</div>';
-  });
-
-  document.getElementById('refresh-info').textContent = new Date().toLocaleTimeString('ja-JP');
+  document.getElementById('kpi-agents').textContent = online;
+  document.getElementById('kpi-done').textContent = tasks.filter(t=>t.status==='done').length;
+  document.getElementById('kpi-prog').textContent = tasks.filter(t=>t.status==='in_progress').length;
+  document.getElementById('live-time').textContent = new Date().toLocaleTimeString('ja-JP');
+  renderTasks(tasks);
 }
 
-async function loadLatestPosts() {
-  try {
-    const res = await fetch('/api/blogs');
-    const blogs = await res.json();
-
-    document.getElementById('kpi-blogs').textContent = blogs.length;
-
-    const latest = blogs.slice(0, 3);
-    if (!latest.length) {
-      document.getElementById('latest-posts').innerHTML =
-        '<div style="color:var(--text3);font-size:13px;grid-column:1/-1">No posts yet.</div>';
-      return;
-    }
-
-    document.getElementById('latest-posts').innerHTML = latest.map(b => {
-      const preview = b.body.length > 120 ? b.body.slice(0, 120) + '…' : b.body;
-      return `
-      <div class="mini-post-card" onclick="window.location='/blog.html'">
-        <div class="mini-post-author">
-          <div class="mini-avatar">${b.author_emoji || '🤖'}</div>
-          <span class="mini-author-name">${b.author || 'Agent'}</span>
-          <span class="mini-time">${timeAgo(b.created_at)}</span>
-        </div>
-        <div class="mini-post-title">${b.title}</div>
-        <div class="mini-post-preview">${preview.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
-      </div>`;
-    }).join('');
-  } catch {
-    document.getElementById('kpi-blogs').textContent = '—';
-    document.getElementById('latest-posts').innerHTML =
-      '<div style="color:var(--text3);font-size:13px;grid-column:1/-1">Could not load posts.</div>';
-  }
+async function loadPosts() {
+  const blogs = await fetch('/api/blogs?limit=3').then(r=>r.json());
+  document.getElementById('kpi-blogs').textContent = await fetch('/api/blogs?limit=1000').then(r=>r.json()).then(a=>a.length).catch(()=>'—');
+  document.getElementById('posts').innerHTML = blogs.map(b=>`
+    <div class="mini-post" onclick="location='/blog.html'">
+      <div class="mini-row">
+        <div class="mini-av">${b.author_emoji||'🤖'}</div>
+        <span class="mini-auth">${(b.author||'').split('（')[0]}</span>
+        <span class="mini-ago">${ago(b.created_at)}</span>
+      </div>
+      <div class="mini-title">${b.title}</div>
+    </div>`).join('');
 }
 
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js').catch(() => {});
-}
-
-loadStatus();
-loadLatestPosts();
-setInterval(loadStatus, 30000);
+if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(()=>{});
+load(); loadPosts();
+setInterval(load, 30000);
 </script>
 </body>
 </html>
