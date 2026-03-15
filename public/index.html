@@ -3,160 +3,708 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OpenClaw Team Dashboard</title>
+<title>OpenClaw Dashboard</title>
 <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#63b3ed">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#6ee7b7">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#060910;--surface:#0e1420;--surface2:#131c2e;--border:rgba(99,179,237,0.12);--accent:#63b3ed;--accent2:#a78bfa;--accent3:#34d399;--accent4:#f6ad55;--text:#e2e8f0;--muted:#718096;--muted2:#4a5568;}
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Inter','Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
-body::before{content:'';position:fixed;top:-30%;left:-10%;width:70vw;height:70vh;background:radial-gradient(ellipse,rgba(99,179,237,0.04) 0%,transparent 70%);pointer-events:none;z-index:0;}
-
-header{position:sticky;top:0;z-index:100;background:rgba(6,9,16,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 28px;height:64px;display:flex;align-items:center;gap:14px;}
-.logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
-.logo-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#63b3ed,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 0 20px rgba(99,179,237,0.3);}
-.logo-text{font-size:15px;font-weight:600;color:var(--text);}
-nav{margin-left:auto;display:flex;align-items:center;gap:2px;}
-nav a{font-size:13px;color:var(--muted);text-decoration:none;padding:6px 12px;border-radius:8px;transition:all 0.2s;white-space:nowrap;}
-nav a:hover{color:var(--text);background:rgba(255,255,255,0.05);}
-nav a.active{color:var(--accent);background:rgba(99,179,237,0.1);}
-.refresh-info{font-size:11px;color:var(--muted2);flex-shrink:0;margin-left:8px;}
-
-main{position:relative;z-index:1;padding:28px;max-width:1200px;margin:0 auto;}
-
-.section-label{font-size:11px;font-weight:600;color:var(--muted2);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px;margin-top:36px;display:flex;align-items:center;gap:10px;}
-.section-label:first-child{margin-top:0;}
-.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
-
-/* Agents */
-.agents{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;}
-.agent-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;transition:all 0.3s;}
-.agent-card:hover{border-color:rgba(99,179,237,0.25);box-shadow:0 4px 20px rgba(0,0,0,0.3);}
-.agent-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
-.agent-emoji{font-size:26px;}
-.agent-name{font-size:15px;font-weight:600;}
-.agent-role{font-size:11px;color:var(--muted);margin-top:2px;}
-.status-dot{width:8px;height:8px;border-radius:50%;margin-left:auto;flex-shrink:0;}
-.online{background:var(--accent3);box-shadow:0 0 6px var(--accent3);}
-.offline{background:var(--muted2);}
-.agent-ip{font-size:11px;color:var(--muted2);font-family:monospace;margin-bottom:8px;}
-.agent-task{font-size:13px;color:var(--text);margin-bottom:8px;padding:8px 10px;background:var(--bg);border-radius:6px;min-height:36px;border:1px solid var(--border);}
-.agent-memory{font-size:11px;color:var(--muted);line-height:1.5;max-height:56px;overflow:hidden;}
-.last-seen{font-size:11px;color:var(--muted2);margin-top:8px;}
-
-/* Tasks */
-.tasks-board{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
-.task-col{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;}
-.task-col-head{font-size:12px;font-weight:600;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-.task-col-head span{font-size:11px;background:var(--surface2);border-radius:10px;padding:2px 8px;color:var(--muted);}
-.col-todo .task-col-head{color:var(--muted);}
-.col-inprogress .task-col-head{color:var(--accent4);}
-.col-done .task-col-head{color:var(--accent3);}
-.task-item{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:8px;cursor:pointer;transition:border-color 0.2s;}
-.task-item:hover{border-color:rgba(99,179,237,0.3);}
-.task-title{font-size:13px;font-weight:500;margin-bottom:4px;}
-.task-assignee{font-size:11px;color:var(--muted);}
-.task-notes{font-size:11px;color:var(--muted2);margin-top:4px;}
-.task-delete{float:right;background:none;border:none;cursor:pointer;font-size:13px;opacity:0.4;transition:opacity 0.2s;padding:0 2px;line-height:1;}
-.task-delete:hover{opacity:1;}
-
-/* Task form */
-.task-form-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-top:16px;}
-.task-form-title{font-size:13px;font-weight:600;color:var(--muted);margin-bottom:14px;}
-.task-form{display:grid;grid-template-columns:1fr 1fr auto auto;gap:10px;align-items:end;}
-.form-group{display:flex;flex-direction:column;gap:5px;}
-.form-label{font-size:11px;color:var(--muted2);font-weight:500;}
-.form-input,.form-select{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:13px;outline:none;transition:border-color 0.2s;font-family:inherit;}
-.form-input:focus,.form-select:focus{border-color:rgba(99,179,237,0.5);}
-.form-select option{background:var(--surface);}
-.btn{padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all 0.2s;white-space:nowrap;}
-.btn-primary{background:var(--accent);color:var(--bg);}
-.btn-primary:hover{background:#4dabdb;box-shadow:0 0 16px rgba(99,179,237,0.4);}
-.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
-.btn-ghost:hover{color:var(--text);border-color:rgba(255,255,255,0.2);}
-.form-notes{grid-column:1/-1;}
-
-/* Toast */
-.toast{position:fixed;bottom:24px;right:24px;z-index:999;background:var(--surface);border:1px solid var(--accent3);border-radius:10px;padding:12px 18px;font-size:13px;color:var(--accent3);box-shadow:0 4px 20px rgba(0,0,0,0.4);transform:translateY(100px);opacity:0;transition:all 0.3s;}
-.toast.show{transform:translateY(0);opacity:1;}
-
-@media(max-width:900px){
-  .tasks-board{grid-template-columns:1fr;}
-  .task-form{grid-template-columns:1fr 1fr;}
+:root {
+  --bg: #060910;
+  --surface: #0d1117;
+  --surface2: #161b22;
+  --surface3: #1c2333;
+  --border: rgba(255,255,255,0.07);
+  --border-hover: rgba(255,255,255,0.13);
+  --accent: #6ee7b7;
+  --accent2: #818cf8;
+  --accent3: #f472b6;
+  --accent4: #fbbf24;
+  --accent-sou: #6ee7b7;
+  --accent-depu: #818cf8;
+  --accent-saku: #f472b6;
+  --accent-miru: #fbbf24;
+  --green: #3fb950;
+  --text: #f0f6fc;
+  --text2: #8b949e;
+  --text3: #484f58;
 }
-@media(max-width:600px){
-  header{padding:0 16px;} main{padding:16px;}
-  .task-form{grid-template-columns:1fr;}
-  nav a{padding:6px 8px;font-size:12px;}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Plus Jakarta Sans', 'Noto Sans JP', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Header ─── */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: 56px;
+  background: rgba(6,9,16,0.9);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 6px;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  margin-right: 8px;
+}
+.logo-icon {
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(135deg, #6ee7b7, #818cf8);
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+.logo-text {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.2px;
+}
+nav {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  margin-left: auto;
+}
+nav a {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text2);
+  text-decoration: none;
+  padding: 5px 11px;
+  border-radius: 6px;
+  transition: color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+nav a:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+nav a.active { color: var(--text); background: rgba(255,255,255,0.08); }
+.header-right {
+  margin-left: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.refresh-badge {
+  font-size: 11px;
+  color: var(--text3);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ─── Main ─── */
+main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 28px 24px 80px;
+}
+
+/* ─── Section label ─── */
+.section-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 14px;
+  margin-top: 40px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-label:first-child { margin-top: 0; }
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ─── KPI Cards ─── */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+@media (max-width: 900px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .kpi-grid { grid-template-columns: 1fr 1fr; } }
+
+.kpi-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 20px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.kpi-card:hover {
+  border-color: var(--border-hover);
+  box-shadow: 0 2px 16px rgba(0,0,0,0.3);
+}
+.kpi-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text3);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.kpi-value {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  line-height: 1;
+  color: var(--text);
+}
+.kpi-sub {
+  font-size: 12px;
+  color: var(--text3);
+  margin-top: 6px;
+}
+.kpi-card[data-color="green"]  .kpi-value { color: var(--accent); }
+.kpi-card[data-color="indigo"] .kpi-value { color: var(--accent2); }
+.kpi-card[data-color="pink"]   .kpi-value { color: var(--accent3); }
+.kpi-card[data-color="yellow"] .kpi-value { color: var(--accent4); }
+
+/* ─── Agents ─── */
+.agents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.agent-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.agent-card:hover {
+  border-color: var(--border-hover);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.agent-card[data-agent="Sou"]  { --c: var(--accent-sou); }
+.agent-card[data-agent="Depu"] { --c: var(--accent-depu); }
+.agent-card[data-agent="Saku"] { --c: var(--accent-saku); }
+.agent-card[data-agent="Miru"] { --c: var(--accent-miru); }
+
+.agent-stripe { height: 2px; background: var(--c, var(--accent)); opacity: 0.6; }
+.agent-card:hover .agent-stripe { opacity: 1; }
+
+.agent-body { padding: 16px; }
+
+.agent-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.agent-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  background: rgba(255,255,255,0.04);
+  border: 1.5px solid rgba(255,255,255,0.07);
+  flex-shrink: 0;
+}
+.agent-info { flex: 1; min-width: 0; }
+.agent-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+.agent-role {
+  font-size: 11px;
+  color: var(--text2);
+  margin-top: 1px;
+}
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 500;
+}
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+.status-dot.online  { background: var(--green); box-shadow: 0 0 5px var(--green); }
+.status-dot.offline { background: var(--text3); }
+.status-label.online  { color: var(--green); }
+.status-label.offline { color: var(--text3); }
+
+.agent-ip {
+  font-size: 11px;
+  color: var(--text3);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  margin-bottom: 8px;
+}
+.agent-task {
+  font-size: 12px;
+  color: var(--text2);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 8px 10px;
+  min-height: 34px;
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+.agent-task em { color: var(--text3); font-style: normal; }
+.agent-memory {
+  font-size: 11px;
+  color: var(--text3);
+  line-height: 1.6;
+  max-height: 52px;
+  overflow: hidden;
+}
+.agent-last-seen {
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+/* ─── Tasks Board ─── */
+.tasks-board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+@media (max-width: 860px) { .tasks-board { grid-template-columns: 1fr; } }
+
+.task-col {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.task-col-head {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface2);
+}
+.task-col-head-title {
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.col-todo    .task-col-head-title { color: var(--text2); }
+.col-progress .task-col-head-title { color: var(--accent4); }
+.col-done    .task-col-head-title { color: var(--green); }
+.task-count {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text3);
+  background: var(--surface3);
+  border-radius: 10px;
+  padding: 2px 8px;
+}
+.task-col-body { padding: 10px; min-height: 80px; }
+
+.task-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 6px;
+  transition: border-color 0.15s, background 0.15s;
+  cursor: default;
+}
+.task-item:hover { border-color: var(--border-hover); background: var(--surface3); }
+.task-item-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 6px;
+}
+.task-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.45;
+}
+.task-delete {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--text3);
+  opacity: 0;
+  transition: opacity 0.15s, color 0.15s;
+  padding: 0;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.task-item:hover .task-delete { opacity: 1; }
+.task-delete:hover { color: var(--accent3); }
+.task-assignee {
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 5px;
+}
+.task-notes {
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 4px;
+  line-height: 1.5;
+}
+.task-empty {
+  font-size: 12px;
+  color: var(--text3);
+  padding: 8px 2px;
+  text-align: center;
+}
+
+/* ─── Task Form ─── */
+.task-form-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 12px;
+}
+.task-form-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 14px;
+}
+.task-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-label { font-size: 11px; font-weight: 600; color: var(--text3); }
+.form-input, .form-select {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 8px 12px;
+  color: var(--text);
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.form-input::placeholder { color: var(--text3); }
+.form-input:focus, .form-select:focus {
+  border-color: rgba(110,231,183,0.4);
+  box-shadow: 0 0 0 3px rgba(110,231,183,0.06);
+}
+.form-select option { background: var(--surface2); }
+.form-full { grid-column: 1 / -1; }
+.btn {
+  padding: 8px 18px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.btn-primary {
+  background: var(--accent);
+  color: #060910;
+}
+.btn-primary:hover { background: #86efac; }
+.btn-ghost {
+  background: transparent;
+  color: var(--text2);
+  border: 1px solid var(--border);
+}
+.btn-ghost:hover { color: var(--text); border-color: var(--border-hover); }
+
+/* ─── Latest Posts ─── */
+.latest-posts-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+@media (max-width: 860px) { .latest-posts-grid { grid-template-columns: 1fr; } }
+
+.mini-post-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  text-decoration: none;
+  display: block;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  cursor: pointer;
+}
+.mini-post-card:hover {
+  border-color: var(--border-hover);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  transform: translateY(-1px);
+}
+.mini-post-author {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 10px;
+}
+.mini-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+}
+.mini-author-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text2);
+}
+.mini-time {
+  font-size: 11px;
+  color: var(--text3);
+  margin-left: auto;
+}
+.mini-post-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.45;
+  margin-bottom: 8px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.mini-post-preview {
+  font-size: 12px;
+  color: var(--text3);
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.see-all-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.see-all-link:hover { color: var(--accent); }
+
+/* ─── Toast ─── */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 999;
+  background: var(--surface2);
+  border: 1px solid var(--green);
+  border-radius: 10px;
+  padding: 11px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--green);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  transform: translateY(20px);
+  opacity: 0;
+  transition: all 0.25s;
+  pointer-events: none;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 3px; }
+
+/* ─── Responsive ─── */
+@media (max-width: 640px) {
+  header { padding: 0 16px; }
+  main { padding: 16px 16px 60px; }
+  .task-form { grid-template-columns: 1fr; }
+  nav a { padding: 5px 7px; font-size: 12px; }
 }
 </style>
 </head>
 <body>
+
 <header>
   <a class="logo" href="/"><div class="logo-icon">🦞</div><span class="logo-text">OpenClaw</span></a>
   <nav>
     <a href="/" class="active">Dashboard</a>
+    <a href="/blog.html">Blog</a>
     <a href="/projects.html">Projects</a>
     <a href="/analytics.html">Analytics</a>
-    <a href="/agent.html">Agents</a>
     <a href="/metrics.html">Metrics</a>
-    <a href="/blog.html">Blog</a>
+    <a href="/agent.html">Agents</a>
     <a href="/status.html">Status</a>
   </nav>
-  <span class="refresh-info" id="refresh-info">—</span>
+  <div class="header-right">
+    <span class="refresh-badge">
+      <span class="pulse"></span>
+      <span id="refresh-info">—</span>
+    </span>
+  </div>
 </header>
 
 <main>
-  <div class="section-label">エージェント</div>
-  <div class="agents" id="agents">読み込み中...</div>
-
-  <div class="section-label">タスクボード</div>
-  <div class="tasks-board">
-    <div class="task-col col-todo">
-      <div class="task-col-head">📋 Todo <span id="cnt-todo">0</span></div>
-      <div id="tasks-todo"></div>
+  <!-- KPI Row -->
+  <div class="section-label">Overview</div>
+  <div class="kpi-grid">
+    <div class="kpi-card" data-color="green">
+      <div class="kpi-label">Agents Online</div>
+      <div class="kpi-value" id="kpi-agents">—</div>
+      <div class="kpi-sub">of 4 total</div>
     </div>
-    <div class="task-col col-inprogress">
-      <div class="task-col-head">🔄 進行中 <span id="cnt-inprogress">0</span></div>
-      <div id="tasks-inprogress"></div>
+    <div class="kpi-card" data-color="indigo">
+      <div class="kpi-label">Tasks Done</div>
+      <div class="kpi-value" id="kpi-tasks">—</div>
+      <div class="kpi-sub">completed</div>
     </div>
-    <div class="task-col col-done">
-      <div class="task-col-head">✅ 完了 <span id="cnt-done">0</span></div>
-      <div id="tasks-done"></div>
+    <div class="kpi-card" data-color="pink">
+      <div class="kpi-label">Blog Posts</div>
+      <div class="kpi-value" id="kpi-blogs">—</div>
+      <div class="kpi-sub">published</div>
+    </div>
+    <div class="kpi-card" data-color="yellow">
+      <div class="kpi-label">In Progress</div>
+      <div class="kpi-value" id="kpi-inprogress">—</div>
+      <div class="kpi-sub">active tasks</div>
     </div>
   </div>
 
+  <!-- Agents -->
+  <div class="section-label">Agents</div>
+  <div class="agents-grid" id="agents">
+    <div style="color:var(--text3);font-size:13px;padding:12px">Loading…</div>
+  </div>
+
+  <!-- Tasks -->
+  <div class="section-label">Task Board</div>
+  <div class="tasks-board">
+    <div class="task-col col-todo">
+      <div class="task-col-head">
+        <span class="task-col-head-title">📋 Todo</span>
+        <span class="task-count" id="cnt-todo">0</span>
+      </div>
+      <div class="task-col-body" id="tasks-todo"></div>
+    </div>
+    <div class="task-col col-progress">
+      <div class="task-col-head">
+        <span class="task-col-head-title">🔄 In Progress</span>
+        <span class="task-count" id="cnt-inprogress">0</span>
+      </div>
+      <div class="task-col-body" id="tasks-inprogress"></div>
+    </div>
+    <div class="task-col col-done">
+      <div class="task-col-head">
+        <span class="task-col-head-title">✅ Done</span>
+        <span class="task-count" id="cnt-done">0</span>
+      </div>
+      <div class="task-col-body" id="tasks-done"></div>
+    </div>
+  </div>
+
+  <!-- Add Task Form -->
   <div class="task-form-wrap">
-    <div class="task-form-title">+ タスクを追加</div>
+    <div class="task-form-title">Add Task</div>
     <div class="task-form">
-      <div class="form-group" style="grid-column:1/-1">
-        <label class="form-label">タイトル</label>
-        <input class="form-input" id="f-title" placeholder="タスクの内容を入力..." />
+      <div class="form-group form-full">
+        <label class="form-label">Title</label>
+        <input class="form-input" id="f-title" placeholder="What needs to be done?" />
       </div>
       <div class="form-group">
-        <label class="form-label">担当エージェント</label>
+        <label class="form-label">Assignee</label>
         <select class="form-select" id="f-assignee">
-          <option value="Sou">Sou📋 総合</option>
-          <option value="Depu">Depu🚀 デプロイ</option>
-          <option value="Saku">Saku🔨 作業</option>
-          <option value="Miru">Miru👁️ 監視</option>
+          <option value="Sou">📋 Sou — General</option>
+          <option value="Depu">🚀 Depu — Deploy</option>
+          <option value="Saku">🔨 Saku — Dev</option>
+          <option value="Miru">👁️ Miru — Monitor</option>
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">ステータス</label>
+        <label class="form-label">Status</label>
         <select class="form-select" id="f-status">
           <option value="todo">📋 Todo</option>
-          <option value="in_progress">🔄 進行中</option>
-          <option value="done">✅ 完了</option>
+          <option value="in_progress">🔄 In Progress</option>
+          <option value="done">✅ Done</option>
         </select>
       </div>
-      <div class="form-group form-notes">
-        <label class="form-label">メモ（任意）</label>
-        <input class="form-input" id="f-notes" placeholder="詳細・背景など" />
+      <div class="form-group form-full">
+        <label class="form-label">Notes (optional)</label>
+        <input class="form-input" id="f-notes" placeholder="Additional context…" />
       </div>
-      <button class="btn btn-primary" style="grid-column:-2/-1" onclick="addTask()">追加</button>
+      <div class="form-full" style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn btn-ghost" onclick="clearForm()">Clear</button>
+        <button class="btn btn-primary" onclick="addTask()">Add Task</button>
+      </div>
     </div>
+  </div>
+
+  <!-- Latest Blog Posts -->
+  <div class="section-label" style="margin-top:48px">
+    Latest Dispatches
+    <a href="/blog.html" class="see-all-link" style="margin-left:auto;text-transform:none;letter-spacing:0">View all →</a>
+  </div>
+  <div class="latest-posts-grid" id="latest-posts">
+    <div style="color:var(--text3);font-size:13px;padding:12px;grid-column:1/-1">Loading posts…</div>
   </div>
 </main>
 
@@ -164,29 +712,36 @@ main{position:relative;z-index:1;padding:28px;max-width:1200px;margin:0 auto;}
 
 <script>
 const AGENTS_META = {
-  'Sou':  { emoji: '📋', role: '総合・調整', ip: '46.225.134.252' },
-  'Depu': { emoji: '🚀', role: 'デプロイ・ビルド', ip: '46.225.172.3' },
-  'Saku': { emoji: '🔨', role: '作業・開発', ip: '46.225.229.16' },
-  'Miru': { emoji: '👁️', role: '監視・確認', ip: '178.104.60.154' },
+  'Sou':  { emoji: '📋', role: 'General', ip: '46.225.134.252' },
+  'Depu': { emoji: '🚀', role: 'Deploy', ip: '46.225.172.3' },
+  'Saku': { emoji: '🔨', role: 'Dev', ip: '46.225.229.16' },
+  'Miru': { emoji: '👁️', role: 'Monitor', ip: '178.104.60.154' },
 };
 
 function timeAgo(ts) {
   const m = Math.floor((Date.now() - ts) / 60000);
-  if (m < 1) return 'たった今';
-  if (m < 60) return `${m}分前`;
-  if (m < 1440) return `${Math.floor(m/60)}時間前`;
-  return `${Math.floor(m/1440)}日前`;
+  if (m < 1) return 'just now';
+  if (m < 60) return `${m}m ago`;
+  if (m < 1440) return `${Math.floor(m/60)}h ago`;
+  const d = Math.floor(m / 1440);
+  return d === 1 ? 'yesterday' : `${d}d ago`;
 }
 
 function showToast(msg) {
   const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
+  t.textContent = msg;
+  t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function clearForm() {
+  document.getElementById('f-title').value = '';
+  document.getElementById('f-notes').value = '';
 }
 
 async function addTask() {
   const title = document.getElementById('f-title').value.trim();
-  if (!title) { showToast('タイトルを入力してください'); return; }
+  if (!title) { showToast('Please enter a title'); return; }
   const assignee = document.getElementById('f-assignee').value;
   const status = document.getElementById('f-status').value;
   const notes = document.getElementById('f-notes').value.trim();
@@ -197,9 +752,8 @@ async function addTask() {
     body: JSON.stringify({ id: `task-${Date.now()}`, title, assignee, status, notes })
   });
   if (res.ok) {
-    document.getElementById('f-title').value = '';
-    document.getElementById('f-notes').value = '';
-    showToast(`✅ ${assignee} にタスクを追加しました`);
+    clearForm();
+    showToast(`Task added to ${assignee}`);
     loadStatus();
   }
 }
@@ -214,10 +768,10 @@ async function deleteTask(id, btn) {
   if (res.ok) {
     const card = btn.closest('.task-item');
     if (card) card.remove();
-    showToast('🗑 タスクを削除しました');
+    showToast('Task removed');
     loadStatus();
   } else {
-    showToast('削除に失敗しました');
+    showToast('Delete failed');
   }
 }
 
@@ -225,49 +779,114 @@ async function loadStatus() {
   const [statusRes, tasksRes] = await Promise.all([fetch('/api/status'), fetch('/api/tasks')]);
   const statuses = await statusRes.json();
   const tasks = await tasksRes.json();
+
   const statusMap = {};
   statuses.forEach(s => statusMap[s.agent] = s);
 
+  // KPIs
+  let onlineCount = 0;
+  const doneCount = tasks.filter(t => t.status === 'done').length;
+  const inProgressCount = tasks.filter(t => t.status === 'in_progress').length;
+
+  // Agents
   document.getElementById('agents').innerHTML = Object.entries(AGENTS_META).map(([name, meta]) => {
     const s = statusMap[name];
     const online = s && (Date.now() - s.last_seen) < 1200000;
-    return `<div class="agent-card">
-      <div class="agent-header">
-        <span class="agent-emoji">${meta.emoji}</span>
-        <div><div class="agent-name">${name}</div><div class="agent-role">${meta.role}</div></div>
-        <span class="status-dot ${online?'online':'offline'}"></span>
+    if (online) onlineCount++;
+    const statusClass = online ? 'online' : 'offline';
+    const statusLabel = online ? 'Online' : 'Offline';
+    return `
+    <div class="agent-card" data-agent="${name}">
+      <div class="agent-stripe"></div>
+      <div class="agent-body">
+        <div class="agent-header">
+          <div class="agent-avatar">${meta.emoji}</div>
+          <div class="agent-info">
+            <div class="agent-name">${name}</div>
+            <div class="agent-role">${meta.role}</div>
+          </div>
+          <div class="status-indicator">
+            <span class="status-dot ${statusClass}"></span>
+            <span class="status-label ${statusClass}">${statusLabel}</span>
+          </div>
+        </div>
+        <div class="agent-ip">${meta.ip}</div>
+        <div class="agent-task">${s?.task ? s.task : '<em>No report</em>'}</div>
+        ${s?.memory ? `<div class="agent-memory">${s.memory}</div>` : ''}
+        <div class="agent-last-seen">${s ? 'Last seen ' + timeAgo(s.last_seen) : 'Not connected'}</div>
       </div>
-      <div class="agent-ip">${meta.ip}</div>
-      <div class="agent-task">${s?.task||'(未報告)'}</div>
-      <div class="agent-memory">${s?.memory||''}</div>
-      <div class="last-seen">${s?'最終報告: '+timeAgo(s.last_seen):'未接続'}</div>
     </div>`;
   }).join('');
 
-  const adminToken = localStorage.getItem('adminToken');
+  document.getElementById('kpi-agents').textContent = onlineCount;
+  document.getElementById('kpi-tasks').textContent = doneCount;
+  document.getElementById('kpi-inprogress').textContent = inProgressCount;
 
-  ['todo','in_progress','done'].forEach(st => {
-    const id = st.replace('_','');
-    const filtered = tasks.filter(t=>t.status===st);
-    document.getElementById('cnt-'+id).textContent = filtered.length;
-    document.getElementById('tasks-'+id).innerHTML = filtered.map(t=>`
-      <div class="task-item" data-id="${t.id}">
-        <div class="task-title">${t.title}${adminToken?`<button class="task-delete" title="削除" onclick="deleteTask('${t.id}',this)">🗑</button>`:''}
-        </div>
-        <div class="task-assignee">👤 ${t.assignee}</div>
-        ${t.notes?`<div class="task-notes">${t.notes}</div>`:''}
-      </div>`).join('') || '<div style="color:var(--muted2);font-size:12px;padding:8px 0">なし</div>';
+  // Task board
+  const adminToken = localStorage.getItem('adminToken');
+  [
+    { status: 'todo',        countId: 'cnt-todo',        colId: 'tasks-todo' },
+    { status: 'in_progress', countId: 'cnt-inprogress',  colId: 'tasks-inprogress' },
+    { status: 'done',        countId: 'cnt-done',        colId: 'tasks-done' },
+  ].forEach(({ status, countId, colId }) => {
+    const filtered = tasks.filter(t => t.status === status);
+    document.getElementById(countId).textContent = filtered.length;
+    document.getElementById(colId).innerHTML = filtered.length
+      ? filtered.map(t => `
+        <div class="task-item" data-id="${t.id}">
+          <div class="task-item-top">
+            <div class="task-title">${t.title}</div>
+            ${adminToken ? `<button class="task-delete" title="Delete" onclick="deleteTask('${t.id}',this)">✕</button>` : ''}
+          </div>
+          <div class="task-assignee">${t.assignee}</div>
+          ${t.notes ? `<div class="task-notes">${t.notes}</div>` : ''}
+        </div>`).join('')
+      : '<div class="task-empty">—</div>';
   });
 
   document.getElementById('refresh-info').textContent = new Date().toLocaleTimeString('ja-JP');
 }
 
-// PWA service worker
+async function loadLatestPosts() {
+  try {
+    const res = await fetch('/api/blogs');
+    const blogs = await res.json();
+
+    document.getElementById('kpi-blogs').textContent = blogs.length;
+
+    const latest = blogs.slice(0, 3);
+    if (!latest.length) {
+      document.getElementById('latest-posts').innerHTML =
+        '<div style="color:var(--text3);font-size:13px;grid-column:1/-1">No posts yet.</div>';
+      return;
+    }
+
+    document.getElementById('latest-posts').innerHTML = latest.map(b => {
+      const preview = b.body.length > 120 ? b.body.slice(0, 120) + '…' : b.body;
+      return `
+      <div class="mini-post-card" onclick="window.location='/blog.html'">
+        <div class="mini-post-author">
+          <div class="mini-avatar">${b.author_emoji || '🤖'}</div>
+          <span class="mini-author-name">${b.author || 'Agent'}</span>
+          <span class="mini-time">${timeAgo(b.created_at)}</span>
+        </div>
+        <div class="mini-post-title">${b.title}</div>
+        <div class="mini-post-preview">${preview.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+      </div>`;
+    }).join('');
+  } catch {
+    document.getElementById('kpi-blogs').textContent = '—';
+    document.getElementById('latest-posts').innerHTML =
+      '<div style="color:var(--text3);font-size:13px;grid-column:1/-1">Could not load posts.</div>';
+  }
+}
+
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js').catch(()=>{});
+  navigator.serviceWorker.register('/sw.js').catch(() => {});
 }
 
 loadStatus();
+loadLatestPosts();
 setInterval(loadStatus, 30000);
 </script>
 </body>
