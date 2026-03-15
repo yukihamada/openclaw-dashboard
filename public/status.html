@@ -1,226 +1,177 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Service Status — OpenClaw</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>Status — OpenClaw</title>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#060910;--surface:#0e1420;--surface2:#131c2e;--border:rgba(99,179,237,0.12);--accent:#63b3ed;--accent2:#a78bfa;--accent3:#34d399;--accent4:#f6ad55;--red:#fc8181;--text:#e2e8f0;--muted:#718096;--muted2:#4a5568;}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
-body::before{content:'';position:fixed;top:-30%;left:-10%;width:70vw;height:70vh;background:radial-gradient(ellipse,rgba(99,179,237,0.04) 0%,transparent 70%);pointer-events:none;z-index:0;}
-
-header{position:sticky;top:0;z-index:100;background:rgba(6,9,16,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 28px;height:64px;display:flex;align-items:center;gap:14px;}
-.logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
-.logo-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#63b3ed,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 0 20px rgba(99,179,237,0.3);}
-.logo-text{font-size:15px;font-weight:600;color:var(--text);}
-nav{margin-left:auto;display:flex;align-items:center;gap:2px;}
-nav a{font-size:13px;color:var(--muted);text-decoration:none;padding:6px 12px;border-radius:8px;transition:all 0.2s;white-space:nowrap;}
-nav a:hover{color:var(--text);background:rgba(255,255,255,0.05);}
-nav a.active{color:var(--accent);background:rgba(99,179,237,0.1);}
-
-main{position:relative;z-index:1;padding:28px;max-width:800px;margin:0 auto;}
-
-.page-title{font-size:24px;font-weight:700;margin-bottom:6px;}
-.page-sub{font-size:14px;color:var(--muted);margin-bottom:28px;}
-
-.summary-bar{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:24px;display:flex;align-items:center;gap:16px;}
-.summary-icon{font-size:28px;}
-.summary-text{flex:1;}
-.summary-headline{font-size:16px;font-weight:600;}
-.summary-sub{font-size:13px;color:var(--muted);margin-top:2px;}
-.summary-bar.all-up{border-color:rgba(52,211,153,0.3);background:rgba(52,211,153,0.05);}
-.summary-bar.partial-down{border-color:rgba(246,173,85,0.3);background:rgba(246,173,85,0.05);}
-.summary-bar.many-down{border-color:rgba(252,129,129,0.3);background:rgba(252,129,129,0.05);}
-
-.services-table{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
-.services-head{display:grid;grid-template-columns:1fr 100px 90px 140px;gap:0;padding:10px 20px;border-bottom:1px solid var(--border);background:var(--surface2);}
-.services-head span{font-size:11px;font-weight:600;color:var(--muted2);text-transform:uppercase;letter-spacing:1px;}
-.service-row{display:grid;grid-template-columns:1fr 100px 90px 140px;gap:0;padding:14px 20px;border-bottom:1px solid var(--border);align-items:center;transition:background 0.2s;}
-.service-row:last-child{border-bottom:none;}
-.service-row:hover{background:rgba(255,255,255,0.02);}
-.service-name{font-size:14px;font-weight:500;}
-.service-url{font-size:11px;color:var(--muted2);margin-top:2px;font-family:monospace;}
-.status-cell{display:flex;align-items:center;gap:7px;}
-.dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
-.dot-up{background:var(--accent3);box-shadow:0 0 7px var(--accent3);}
-.dot-down{background:var(--red);box-shadow:0 0 7px var(--red);}
-.dot-checking{background:var(--muted2);animation:pulse 1.2s ease-in-out infinite;}
+:root{--bg:#09090b;--surface:#18181b;--border:#27272a;--text:#fafafa;--muted:#a1a1aa;--dim:#52525b;--green:#22c55e;--red:#ef4444;--yellow:#eab308;}
+body{font-family:'Geist','Noto Sans JP',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;}
+nav{height:52px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:20px;position:sticky;top:0;background:rgba(9,9,11,0.92);backdrop-filter:blur(12px);z-index:50;}
+.logo{font-size:14px;font-weight:600;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:8px;}
+.nav-links{display:flex;gap:2px;}
+.nav-links a{font-size:13px;color:var(--muted);text-decoration:none;padding:5px 10px;border-radius:6px;transition:color 0.15s;}
+.nav-links a:hover,.nav-links a.active{color:var(--text);}
+.page{max-width:700px;margin:0 auto;padding:48px 24px 80px;}
+.page-title{font-size:20px;font-weight:600;letter-spacing:-0.3px;margin-bottom:4px;}
+.page-sub{font-size:13px;color:var(--muted);margin-bottom:24px;}
+.summary{display:flex;align-items:center;gap:10px;padding:14px 16px;border-radius:8px;border:1px solid var(--border);margin-bottom:24px;background:var(--surface);}
+.summary.all-up{border-color:rgba(34,197,94,0.3);background:rgba(34,197,94,0.05);}
+.summary.partial{border-color:rgba(234,179,8,0.3);background:rgba(234,179,8,0.05);}
+.summary-icon{font-size:18px;}
+.summary-text{font-size:13px;font-weight:500;}
+.summary-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+.section-title{font-size:11px;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+.services{border-top:1px solid var(--border);margin-bottom:32px;}
+.svc-row{display:grid;grid-template-columns:1fr 80px 90px;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);align-items:center;}
+.svc-row:last-child{border-bottom:none;}
+.svc-name{font-size:13px;font-weight:500;}
+.svc-url{font-size:11px;color:var(--dim);margin-top:2px;}
+.svc-status{display:flex;align-items:center;gap:6px;font-size:12px;}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.dot.up{background:var(--green);}
+.dot.down{background:var(--red);}
+.dot.slow{background:var(--yellow);}
+.dot.checking{background:var(--dim);animation:pulse 1.2s ease-in-out infinite;}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
-.status-label{font-size:13px;font-weight:500;}
-.label-up{color:var(--accent3);}
-.label-down{color:var(--red);}
-.label-checking{color:var(--muted);}
-.latency-cell{font-size:13px;color:var(--muted);font-family:monospace;}
-.latency-fast{color:var(--accent3);}
-.latency-slow{color:var(--accent4);}
-.checked-cell{font-size:12px;color:var(--muted2);}
-
-.refresh-row{display:flex;align-items:center;justify-content:space-between;margin-top:16px;}
-.refresh-note{font-size:12px;color:var(--muted2);}
-.btn-refresh{background:transparent;border:1px solid var(--border);color:var(--muted);font-size:12px;padding:6px 14px;border-radius:8px;cursor:pointer;transition:all 0.2s;font-family:inherit;}
-.btn-refresh:hover{color:var(--text);border-color:rgba(255,255,255,0.2);}
-
-@media(max-width:600px){
-  header{padding:0 16px;}main{padding:16px;}
-  nav a{padding:6px 8px;font-size:12px;}
-  .services-head,.service-row{grid-template-columns:1fr 90px 80px;}
-  .checked-cell{display:none;}
-  .services-head span:last-child{display:none;}
-}
+.svc-latency{font-size:12px;color:var(--dim);text-align:right;}
+.updated{font-size:11px;color:var(--dim);margin-top:16px;text-align:center;}
+@media(max-width:600px){nav{padding:0 16px;}.page{padding:32px 16px 60px;}.svc-row{grid-template-columns:1fr 70px;}.svc-latency{display:none;}}
 </style>
 </head>
 <body>
-<header>
-  <a class="logo" href="/"><div class="logo-icon">🦞</div><span class="logo-text">OpenClaw</span></a>
-  <nav>
+<nav>
+  <a class="logo" href="/"><span>🦞</span> OpenClaw</a>
+  <div class="nav-links">
     <a href="/">Dashboard</a>
     <a href="/projects.html">Projects</a>
     <a href="/analytics.html">Analytics</a>
-    <a href="/agent.html">Agents</a>
-    <a href="/metrics.html">Metrics</a>
     <a href="/blog.html">Blog</a>
     <a href="/status.html" class="active">Status</a>
-  </nav>
-</header>
+  </div>
+</nav>
 
-<main>
+<div class="page">
   <div class="page-title">Service Status</div>
-  <div class="page-sub">Real-time health of all OpenClaw properties</div>
+  <div class="page-sub" id="sub">確認中...</div>
 
-  <div class="summary-bar" id="summary-bar">
-    <div class="summary-icon" id="summary-icon">⏳</div>
-    <div class="summary-text">
-      <div class="summary-headline" id="summary-headline">Checking services...</div>
-      <div class="summary-sub" id="summary-sub">Fetching status from all endpoints</div>
+  <div class="summary" id="summary">
+    <div class="summary-icon">⏳</div>
+    <div>
+      <div class="summary-text">確認中</div>
+      <div class="summary-sub">サービス状態を取得しています...</div>
     </div>
   </div>
 
-  <div class="services-table">
-    <div class="services-head">
-      <span>Service</span>
-      <span>Status</span>
-      <span>Latency</span>
-      <span>Last Checked</span>
-    </div>
-    <div id="services-body">
-      <!-- rows injected by JS -->
-    </div>
-  </div>
+  <div class="section-title">プロダクト</div>
+  <div class="services" id="products-list"></div>
 
-  <div class="refresh-row">
-    <span class="refresh-note" id="refresh-note">Auto-refreshes every 30s</span>
-    <button class="btn-refresh" onclick="loadStatus()">Refresh now</button>
-  </div>
-</main>
+  <div class="section-title">インフラ / エージェント</div>
+  <div class="services" id="infra-list"></div>
+
+  <div class="updated" id="updated"></div>
+</div>
 
 <script>
-const SERVICES = [
-  { name: 'chatweb.ai',      url: 'https://chatweb.ai' },
-  { name: 'teai.io',         url: 'https://teai.io' },
-  { name: 'enablerdao.com',  url: 'https://enablerdao.com' },
-  { name: 'jiuflow.art',     url: 'https://jiuflow.art' },
-  { name: 'stayflowapp.com', url: 'https://stayflowapp.com' },
-  { name: 'misebanai.com',   url: 'https://misebanai.com' },
-  { name: 'banto.work',      url: 'https://banto.work' },
-  { name: 'solun.art',       url: 'https://solun.art' },
-  { name: 'elio.love',       url: 'https://elio.love' },
-  { name: 'yukihamada.jp',   url: 'https://yukihamada.jp' },
+const PRODUCTS = [
+  {name:'chatweb.ai', url:'https://chatweb.ai'},
+  {name:'teai.io', url:'https://teai.io'},
+  {name:'StayFlow', url:'https://stayflowapp.com'},
+  {name:'BANTO', url:'https://banto.work'},
+  {name:'JiuFlow', url:'https://jiuflow.art'},
+  {name:'EnablerDAO', url:'https://enablerdao.com'},
 ];
 
-function formatTime(ts) {
-  if (!ts) return '—';
-  return new Date(ts).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+const AGENTS = [
+  {name:'Sou 📋 (46.225.134.252)', url:'https://openclaw-dashboard-still-sun-5403.fly.dev/api/status'},
+  {name:'OpenClaw Dashboard', url:'https://openclaw-dashboard-still-sun-5403.fly.dev/api/health'},
+];
+
+const ago = ts => {
+  const m = Math.floor((Date.now()-ts)/60000);
+  if(m<1) return 'たった今'; if(m<60) return m+'分前';
+  if(m<1440) return Math.floor(m/60)+'時間前'; return Math.floor(m/1440)+'日前';
+};
+
+function dotClass(status, latency) {
+  if (status !== 'up') return 'down';
+  if (latency > 2000) return 'slow';
+  return 'up';
+}
+function statusLabel(status, latency) {
+  if (status !== 'up') return 'ダウン';
+  if (latency > 2000) return '低速';
+  return '稼働中';
 }
 
-function latencyClass(ms) {
-  if (!ms || ms >= 5000) return '';
-  if (ms < 500) return 'latency-fast';
-  if (ms < 2000) return '';
-  return 'latency-slow';
-}
-
-function renderRows(healthData) {
-  const body = document.getElementById('services-body');
-  body.innerHTML = SERVICES.map(svc => {
-    const h = healthData[svc.url];
-    const isUp = h && h.status === 'up';
-    const isDown = h && h.status === 'down';
-    const latency = h ? h.latency : null;
-    const checkedAt = h ? h.checked_at : null;
-    const dotClass = !h ? 'dot-checking' : isUp ? 'dot-up' : 'dot-down';
-    const labelClass = !h ? 'label-checking' : isUp ? 'label-up' : 'label-down';
-    const labelText = !h ? 'Checking' : isUp ? 'Operational' : 'Down';
-    const latencyText = latency != null ? `${latency}ms` : '—';
-    return `<div class="service-row">
+function renderRows(services, containerId) {
+  document.getElementById(containerId).innerHTML = services.map(s => {
+    const cls = dotClass(s.status, s.latency);
+    const label = statusLabel(s.status, s.latency);
+    const lat = s.latency ? s.latency+'ms' : '—';
+    const name = s.name || (s.url||'').replace('https://','').split('/')[0];
+    const url = s.url ? s.url.replace('https://','') : '';
+    return `<div class="svc-row">
       <div>
-        <div class="service-name">${svc.name}</div>
-        <div class="service-url">${svc.url}</div>
+        <div class="svc-name">${name}</div>
+        <div class="svc-url">${url}</div>
       </div>
-      <div class="status-cell">
-        <span class="dot ${dotClass}"></span>
-        <span class="status-label ${labelClass}">${labelText}</span>
+      <div class="svc-status">
+        <span class="dot ${cls}"></span>
+        <span>${label}</span>
       </div>
-      <div class="latency-cell ${latencyClass(latency)}">${latencyText}</div>
-      <div class="checked-cell">${formatTime(checkedAt)}</div>
+      <div class="svc-latency">${lat}</div>
     </div>`;
   }).join('');
 }
 
-function updateSummary(healthData) {
-  const total = SERVICES.length;
-  let up = 0, down = 0;
-  SERVICES.forEach(svc => {
-    const h = healthData[svc.url];
-    if (h) {
-      if (h.status === 'up') up++;
-      else down++;
-    }
+async function load() {
+  const health = await fetch('/api/health').then(r=>r.json()).catch(()=>({}));
+  const services = Array.isArray(health) ? health : (health.services || []);
+  const agents = Array.isArray(health) ? [] : (health.agents || []);
+
+  // Match products to health data
+  const prodStatus = PRODUCTS.map(p => {
+    const domain = p.url.replace('https://','').split('/')[0];
+    const svc = services.find(s => s.url && s.url.includes(domain));
+    return {
+      name: p.name,
+      url: p.url,
+      status: svc ? svc.status : 'unknown',
+      latency: svc ? svc.latency : 0,
+    };
   });
-  const bar = document.getElementById('summary-bar');
-  const icon = document.getElementById('summary-icon');
-  const headline = document.getElementById('summary-headline');
-  const sub = document.getElementById('summary-sub');
 
-  bar.className = 'summary-bar';
-  if (down === 0 && up > 0) {
-    bar.classList.add('all-up');
-    icon.textContent = '✅';
-    headline.textContent = `All ${total} services operational`;
-    sub.textContent = 'Everything is running smoothly.';
-  } else if (down > 0 && down < total / 2) {
-    bar.classList.add('partial-down');
-    icon.textContent = '⚠️';
-    headline.textContent = `${up} / ${total} services operational`;
-    sub.textContent = `${down} service${down > 1 ? 's are' : ' is'} currently experiencing issues.`;
-  } else if (down >= total / 2) {
-    bar.classList.add('many-down');
-    icon.textContent = '🔴';
-    headline.textContent = `${up} / ${total} services operational`;
-    sub.textContent = 'Multiple services are down. Investigation underway.';
-  } else {
-    icon.textContent = '⏳';
-    headline.textContent = 'Checking services...';
-    sub.textContent = 'Fetching status from all endpoints';
-  }
+  const upCount = prodStatus.filter(s=>s.status==='up').length;
+  const allUp = upCount === prodStatus.length;
+  const summaryEl = document.getElementById('summary');
+  summaryEl.className = 'summary ' + (allUp ? 'all-up' : 'partial');
+  summaryEl.innerHTML = `
+    <div class="summary-icon">${allUp ? '✅' : '⚠️'}</div>
+    <div>
+      <div class="summary-text">${allUp ? 'すべてのサービスが稼働中' : upCount + '/' + prodStatus.length + ' サービス稼働中'}</div>
+      <div class="summary-sub">${allUp ? '正常に動作しています' : '一部のサービスに問題があります'}</div>
+    </div>`;
+
+  document.getElementById('sub').textContent = `最終確認 ${ago(Date.now())}`;
+
+  renderRows(prodStatus, 'products-list');
+
+  // Infra / agents
+  const infraRows = agents.map(a => ({
+    name: `${a.emoji||''} ${a.name}`,
+    url: a.ip || '',
+    status: a.status === 'online' ? 'up' : 'down',
+    latency: 0,
+  }));
+  if (infraRows.length > 0) renderRows(infraRows, 'infra-list');
+  else document.getElementById('infra-list').innerHTML = '<div style="padding:16px 0;font-size:13px;color:var(--dim)">エージェントデータなし</div>';
+
+  document.getElementById('updated').textContent = `最終更新: ${new Date().toLocaleTimeString('ja-JP')}`;
 }
-
-async function loadStatus() {
-  try {
-    const res = await fetch('/api/health');
-    const data = await res.json();
-    renderRows(data);
-    updateSummary(data);
-    document.getElementById('refresh-note').textContent =
-      `Last updated: ${new Date().toLocaleTimeString('en-GB')} — auto-refreshes every 30s`;
-  } catch (e) {
-    document.getElementById('summary-headline').textContent = 'Failed to load status';
-  }
-}
-
-loadStatus();
-setInterval(loadStatus, 30000);
+load();
 </script>
 </body>
 </html>
