@@ -40,6 +40,7 @@ nav{height:52px;border-bottom:1px solid var(--border);display:flex;align-items:c
 .updated{font-size:11px;color:var(--dim);margin-top:16px;text-align:center;}
 @media(max-width:600px){nav{padding:0 16px;}.page{padding:32px 16px 60px;}.svc-row{grid-template-columns:1fr 70px;}.svc-latency{display:none;}}
 </style>
+  <script defer src="https://enabler-analytics.fly.dev/t.js"></script>
 </head>
 <body>
 <nav>
@@ -128,19 +129,19 @@ function renderRows(services, containerId) {
 }
 
 async function load() {
-  const health = await fetch('/api/health').then(r=>r.json()).catch(()=>({}));
-  const services = Array.isArray(health) ? health : (health.services || []);
-  const agents = Array.isArray(health) ? [] : (health.agents || []);
+  const [health, agentData] = await Promise.all([
+    fetch('/api/health').then(r=>r.json()).catch(()=>({})),
+    fetch('/api/status').then(r=>r.json()).catch(()=>[]),
+  ]);
 
-  // Match products to health data
+  // /api/health returns { "https://...": { status, latency } }
   const prodStatus = PRODUCTS.map(p => {
-    const domain = p.url.replace('https://','').split('/')[0];
-    const svc = services.find(s => s.url && s.url.includes(domain));
+    const entry = health[p.url] || health[p.url + '/'] || {};
     return {
       name: p.name,
       url: p.url,
-      status: svc ? svc.status : 'unknown',
-      latency: svc ? svc.latency : 0,
+      status: entry.status || 'unknown',
+      latency: entry.latency || 0,
     };
   });
 
@@ -159,15 +160,35 @@ async function load() {
 
   renderRows(prodStatus, 'products-list');
 
-  // Infra / agents
-  const infraRows = agents.map(a => ({
-    name: `${a.emoji||''} ${a.name}`,
-    url: a.ip || '',
-    status: a.status === 'online' ? 'up' : 'down',
-    latency: 0,
-  }));
-  if (infraRows.length > 0) renderRows(infraRows, 'infra-list');
-  else document.getElementById('infra-list').innerHTML = '<div style="padding:16px 0;font-size:13px;color:var(--dim)">エージェントデータなし</div>';
+  // Infra / agents from /api/status
+  const agents = Array.isArray(agentData) ? agentData : [];
+  const infraRows = agents.map(a => {
+    const stale = a.last_seen && (Date.now() - a.last_seen) > 15 * 60 * 1000;
+    return {
+      name: `${a.emoji||''} ${a.agent||a.name} (${a.ip||''})`,
+      url: a.task || '',
+      status: stale ? 'down' : 'up',
+      latency: a.last_seen ? Math.floor((Date.now() - a.last_seen) / 1000) + 's前' : 0,
+    };
+  });
+  if (infraRows.length > 0) {
+    document.getElementById('infra-list').innerHTML = infraRows.map(s => {
+      const cls = s.status === 'up' ? 'up' : 'down';
+      return `<div class="svc-row">
+        <div>
+          <div class="svc-name">${s.name}</div>
+          <div class="svc-url" style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${s.url}</div>
+        </div>
+        <div class="svc-status">
+          <span class="dot ${cls}"></span>
+          <span>${s.status==='up'?'稼働中':'停止'}</span>
+        </div>
+        <div class="svc-latency">${typeof s.latency === 'string' ? s.latency : (s.latency ? s.latency+'ms' : '—')}</div>
+      </div>`;
+    }).join('');
+  } else {
+    document.getElementById('infra-list').innerHTML = '<div style="padding:16px 0;font-size:13px;color:var(--dim)">エージェントデータなし</div>';
+  }
 
   document.getElementById('updated').textContent = `最終更新: ${new Date().toLocaleTimeString('ja-JP')}`;
 }
